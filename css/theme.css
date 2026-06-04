@@ -1,0 +1,100 @@
+html {
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.theme-toggle .material-symbols-outlined {
+    font-size: 24px;
+}
+
+html.dark body {
+    background-color: #151614;
+    color: #f2f0f0;
+}
+
+html.dark .bg-surface,
+html.dark .bg-background,
+html.dark .bg-surface-bright {
+    background-color: #1b1c1c;
+}
+
+html.dark .bg-surface-container {
+    background-color: #2a2a28;
+}
+
+html.dark .bg-surface-container-low,
+html.dark .bg-surface-container-high {
+    background-color: #303030;
+}
+
+html.dark .bg-surface-dim {
+    background-color: #1b1c1c;
+}
+
+html.dark .bg-white {
+    background-color: #2a2a28;
+}
+
+html.dark .text-primary {
+    color: #d5e3ff;
+}
+
+html.dark .text-on-surface {
+    color: #f2f0f0;
+}
+
+html.dark .text-on-background {
+    color: #f2f0f0;
+}
+
+html.dark .text-on-surface-variant {
+    color: #c8c6c2;
+}
+
+html.dark .text-headline-md,
+html.dark .text-headline-sm,
+html.dark .text-display-lg,
+html.dark .text-display-lg-mobile {
+    color: #f2f0f0;
+}
+
+html.dark .border-outline,
+html.dark .border-outline-variant {
+    border-color: #44474d;
+}
+
+html.dark input,
+html.dark textarea {
+    color: #f2f0f0;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #75777e;
+}
+
+html.dark .editorial-shadow {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+html.dark .bg-surface\/80 {
+    background-color: rgba(27, 28, 28, 0.85);
+}
+
+html.dark aside.bg-surface-container-low {
+    background-color: #2a2a28;
+}
