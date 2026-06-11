@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en">
+<html class="light" lang="es">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Login &amp; Registration | DENIM EDITORIAL</title>
+    <title>Iniciar sesión | DENIM EDITORIAL</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
@@ -28,7 +28,7 @@
             
             <div class="flex gap-4 items-center text-primary dark:text-primary-fixed">
                 <span class="material-symbols-outlined cursor-pointer hover:text-secondary dark:hover:text-secondary-fixed transition-colors" data-icon="search">search</span>
-                <a class="material-symbols-outlined cursor-pointer hover:text-secondary dark:hover:text-secondary-fixed transition-colors text-current no-underline" href="carrito_compras.php" data-icon="shopping_bag" aria-label="Carrito">shopping_bag</a>
+                <?php $cartBasePath = '../'; $cartUrl = 'carrito_compras.php'; $cartPart = 'button'; include __DIR__ . '/../includes/cart-widget.php'; ?>
                 <a class="material-symbols-outlined cursor-pointer hover:text-secondary dark:hover:text-secondary-fixed transition-colors text-current no-underline" href="login.php" data-icon="person" aria-label="Cuenta">person</a>
                 <button type="button" data-theme-toggle class="theme-toggle cursor-pointer transition-opacity duration-200 active:opacity-70 text-primary dark:text-primary-fixed" aria-label="Activar modo oscuro" aria-pressed="false">
                     <span class="material-symbols-outlined theme-toggle-icon">dark_mode</span>
@@ -45,8 +45,8 @@
                 />
                 <div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
                 <div class="absolute bottom-12 left-12 right-12 text-white">
-                    <p class="font-label-sm text-label-sm tracking-[0.2em] mb-4 opacity-80 uppercase">The Craft of Denim</p>
-                    <h2 class="font-headline-md text-headline-md mb-6 leading-tight italic">"True style is an investment in quality that matures with time."</h2>
+                    <p class="font-label-sm text-label-sm tracking-[0.2em] mb-4 opacity-80 uppercase">El oficio del denim</p>
+                    <h2 class="font-headline-md text-headline-md mb-6 leading-tight italic">"El verdadero estilo es una inversión en calidad que madura con el tiempo."</h2>
                     <div class="h-px w-24 bg-white/40"></div>
                 </div>
             </div>
@@ -56,27 +56,25 @@
                     <!-- Login Form -->
                     <div class="space-y-8" id="login-section">
                         <div class="space-y-2">
-                            <h1 class="font-headline-sm text-headline-sm text-primary">Welcome Back
-                            </h1>
-                            <p class="font-body-md text-on-surface-variant">Sign in to access your curated wardrobe.</p>
+                            <h1 class="font-headline-sm text-headline-sm text-primary">Bienvenido de nuevo</h1>
+                            <p class="font-body-md text-on-surface-variant">Inicia sesión para acceder a tu guardarropa curado.</p>
                         </div>
                         <form action="../controllers/loginController.php" method="post" class="space-y-6">
                             <div class="space-y-4">
                                 <div class="relative group">
-                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Email
-                                            Address</label>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Correo electrónico</label>
                                             <input
                                                 name="email"
                                                 class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary transition-all font-body-md text-on-surface placeholder:text-outline-variant/60"
-                                                placeholder="name@example.com"
+                                                placeholder="nombre@ejemplo.com"
                                                 type="email"
                                                 required
                                             />
                                 </div>
                                 <div class="relative group">
                                     <div class="flex justify-between items-center mb-1">
-                                        <label class="block font-label-md text-label-md text-on-surface-variant">Password</label>
-                                        <a class="font-label-sm text-label-sm text-secondary hover:underline" href="login.php">Forgot?</a>
+                                        <label class="block font-label-md text-label-md text-on-surface-variant">Contraseña</label>
+                                        <a class="font-label-sm text-label-sm text-secondary hover:underline" href="login.php">¿Olvidaste tu contraseña?</a>
                                     </div>
                                     <input
                                         name="password"
@@ -88,13 +86,12 @@
                                 </div>
                             </div>
                             <button class="w-full py-4 bg-primary text-white font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
-                                    SIGN IN
+                                    INICIAR SESIÓN
                                 </button>
                         </form>
                         <div class="relative flex items-center py-4">
                             <div class="flex-grow border-t border-outline-variant"></div>
-                            <span class="flex-shrink mx-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Or
-                                    continue with</span>
+                            <span class="flex-shrink mx-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">O continúa con</span>
                             <div class="flex-grow border-t border-outline-variant"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
@@ -121,33 +118,30 @@
                                 </button>
                         </div>
                         <p class="text-center font-body-md text-on-surface-variant">
-                            New to Denim Editorial?
-                            <button class="text-secondary font-label-md text-label-md hover:underline ml-1" onclick="toggleAuth('register')">Create
-                                    Account</button>
+                            ¿Nuevo en Denim Editorial?
+                            <button class="text-secondary font-label-md text-label-md hover:underline ml-1" onclick="toggleAuth('register')">Crear cuenta</button>
                         </p>
                     </div>
                     <!-- Register Form (Hidden Initially) -->
                     <div class="hidden space-y-8" id="register-section">
                         <div class="space-y-2">
-                            <h1 class="font-headline-sm text-headline-sm text-primary">Join the Editorial</h1>
-                            <p class="font-body-md text-on-surface-variant">Craft your personal style profile.</p>
+                            <h1 class="font-headline-sm text-headline-sm text-primary">Únete a la edición</h1>
+                            <p class="font-body-md text-on-surface-variant">Crea tu perfil de estilo personal.</p>
                         </div>
                         <form action="../controllers/registerController.php" method="post" class="space-y-6">
                             <div class="space-y-4">
                                 <div class="relative group">
-                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Full
-                                            Name</label>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Nombre completo</label>
                                     <input
                                         name="nombre"
                                         class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary transition-all font-body-md text-on-surface placeholder:text-outline-variant/60"
-                                        placeholder="Jane Doe"
+                                        placeholder="María García"
                                         type="text"
                                         required
                                     />
                                 </div>
                                 <div class="relative group">
-                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Email
-                                            Address</label>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Correo electrónico</label>
                                     <input
                                         name="email"
                                         class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary transition-all font-body-md text-on-surface placeholder:text-outline-variant/60"
@@ -157,11 +151,11 @@
                                     />
                                 </div>
                                 <div class="relative group">
-                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Password</label>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Contraseña</label>
                                         <input
                                         name="password"
                                         class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary transition-all font-body-md text-on-surface placeholder:text-outline-variant/60"
-                                        placeholder="Min. 8 characters"
+                                        placeholder="Mín. 8 caracteres"
                                         type="password"
                                         required
                                     />
@@ -169,20 +163,15 @@
                             </div>
                             <div class="flex items-start gap-3">
                                 <input class="mt-1 h-4 w-4 rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox" />
-                                <label class="font-label-sm text-label-sm text-on-surface-variant">I
-                                        agree to the <a class="underline"
-                                            href="login.php">Terms of Service</a> and <a
-                                            class="underline" href="login.php">Privacy
-                                            Policy</a>.</label>
+                                <label class="font-label-sm text-label-sm text-on-surface-variant">Acepto los <a class="underline" href="login.php">Términos de servicio</a> y la <a class="underline" href="login.php">Política de privacidad</a>.</label>
                             </div>
                             <button class="w-full py-4 bg-primary text-white font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
-                                    CREATE ACCOUNT
+                                    CREAR CUENTA
                                 </button>
                         </form>
                         <div class="relative flex items-center py-4">
                             <div class="flex-grow border-t border-outline-variant"></div>
-                            <span class="flex-shrink mx-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Or
-                                    sign up with</span>
+                            <span class="flex-shrink mx-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">O regístrate con</span>
                             <div class="flex-grow border-t border-outline-variant"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
@@ -209,9 +198,8 @@
                                 </button>
                         </div>
                         <p class="text-center font-body-md text-on-surface-variant">
-                            Already have an account?
-                            <button class="text-secondary font-label-md text-label-md hover:underline ml-1" onclick="toggleAuth('login')">Sign
-                                    In</button>
+                            ¿Ya tienes cuenta?
+                            <button class="text-secondary font-label-md text-label-md hover:underline ml-1" onclick="toggleAuth('login')">Iniciar sesión</button>
                         </p>
                     </div>
                 </div>
@@ -221,11 +209,10 @@
     <!-- Simple Minimal Footer -->
     <footer class="bg-surface-container-low dark:bg-tertiary-container w-full border-t border-outline-variant dark:border-outline">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto border-t border-outline-variant/30">
-            <span class="font-label-sm text-label-sm text-on-tertiary-fixed-variant uppercase">©
-                    2024 DENIM EDITORIAL. ALL RIGHTS RESERVED.</span>
+            <span class="font-label-sm text-label-sm text-on-tertiary-fixed-variant uppercase">© 2024 DENIM EDITORIAL. TODOS LOS DERECHOS RESERVADOS.</span>
             <div class="flex gap-6">
-                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Contact</a>
-                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Privacy</a>
+                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Contacto</a>
+                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Privacidad</a>
             </div>
         </div>
     </footer>
@@ -262,6 +249,7 @@
             }
         });
     </script>
+    <?php $cartBasePath = '../'; $cartUrl = 'carrito_compras.php'; $cartPart = 'modal'; include __DIR__ . '/../includes/cart-widget.php'; ?>
     <script src="../js/theme.js"></script>
 </body>
 

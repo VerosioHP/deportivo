@@ -65,6 +65,61 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `usuarios`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+-- --------------------------------------------------------
+-- Tablas de productos
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_general_ci,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `productos` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `categoria_id` int NOT NULL,
+  `nombre` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_general_ci NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `imagen_principal` varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+  `imagen_alt` text COLLATE utf8mb4_general_ci,
+  `lavado` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fit` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `material_info` text COLLATE utf8mb4_general_ci,
+  `stock_estado` enum('disponible','pocas_unidades','agotado') COLLATE utf8mb4_general_ci DEFAULT 'disponible',
+  `activo` tinyint(1) DEFAULT '1',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `categoria_id` (`categoria_id`),
+  CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `producto_imagenes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `producto_id` int NOT NULL,
+  `url` varchar(500) COLLATE utf8mb4_general_ci NOT NULL,
+  `alt_text` text COLLATE utf8mb4_general_ci,
+  `orden` int DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `producto_id` (`producto_id`),
+  CONSTRAINT `producto_imagenes_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `producto_tallas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `producto_id` int NOT NULL,
+  `talla` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `producto_id` (`producto_id`),
+  CONSTRAINT `producto_tallas_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

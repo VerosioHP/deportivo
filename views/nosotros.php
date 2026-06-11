@@ -35,28 +35,28 @@
       >
         <a
           class="font-headline-md text-headline-md font-semibold text-primary dark:text-primary-fixed no-underline hover:opacity-80 transition-opacity"
-          href="../index.html"
+          href="../index.php"
           >DENIM EDITORIAL</a
         >
         <div class="hidden md:flex gap-8">
           <a
             class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300"
-            href="catalogo.html"
-            >Catalogo</a
+            href="catalogo.php?categoria=jeans"
+            >Catálogo</a
           >
           <a
             class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300"
-            href="producto.html"
-            >Tops</a
+            href="catalogo.php?categoria=camisetas"
+            >Camisetas</a
           >
           <a
             class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300"
-            href="../index.html"
-            >Jackets</a
+            href="catalogo.php?categoria=chaquetas"
+            >Chaquetas</a
           >
           <a
             class="font-label-md text-label-md uppercase tracking-widest text-secondary dark:text-secondary-fixed-dim border-b-2 border-secondary pb-1 transition-colors duration-300"
-            href="nosotros.html"
+            href="nosotros.php"
             >Nosotros</a
           >
         </div>
@@ -69,15 +69,10 @@
           >
             <span class="material-symbols-outlined">search</span>
           </button>
+            <?php $cartBasePath = '../'; $cartUrl = 'carrito_compras.php'; $cartPart = 'button'; include __DIR__ . '/../includes/cart-widget.php'; ?>
           <a
             class="transition-opacity duration-200 active:opacity-70 text-current no-underline"
-            href="carrito_compras.html"
-            aria-label="Carrito"
-            ><span class="material-symbols-outlined">shopping_bag</span></a
-          >
-          <a
-            class="transition-opacity duration-200 active:opacity-70 text-current no-underline"
-            href="login.html"
+            href="login.php"
             aria-label="Cuenta"
             ><span class="material-symbols-outlined">person</span></a
           >
@@ -316,7 +311,7 @@
         <div class="space-y-6">
           <a
             class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed uppercase no-underline hover:opacity-80 transition-opacity block"
-            href="../index.html"
+            href="../index.php"
             >DENIM EDITORIAL</a
           >
           <p
@@ -334,18 +329,18 @@
           </div>
           <a
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors"
-            href="login.html"
+            href="login.php"
             >Newsletter</a
           >
           <a
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors"
-            href="catalogo.html"
-            >Shipping</a
+            href="catalogo.php"
+            >Envíos</a
           >
           <a
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors"
-            href="login.html"
-            >Contact</a
+            href="login.php"
+            >Contacto</a
           >
         </div>
         <div class="flex flex-col gap-4">
@@ -356,18 +351,18 @@
           </div>
           <a
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors"
-            href="login.html"
-            >Privacy</a
+            href="login.php"
+            >Privacidad</a
           >
           <a
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors"
-            href="login.html"
-            >Terms</a
+            href="login.php"
+            >Términos</a
           >
           <p
             class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container mt-4"
           >
-            © 2024 DENIM EDITORIAL. ALL RIGHTS RESERVED.
+            © 2024 DENIM EDITORIAL. TODOS LOS DERECHOS RESERVADOS.
           </p>
         </div>
       </div>
@@ -400,6 +395,7 @@
         });
       });
     </script>
+    <?php $cartBasePath = '../'; $cartUrl = 'carrito_compras.php'; $cartPart = 'modal'; include __DIR__ . '/../includes/cart-widget.php'; ?>
     <script src="../js/theme.js"></script>
   </body>
 </html>

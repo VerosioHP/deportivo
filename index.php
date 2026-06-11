@@ -20,15 +20,20 @@
     <nav class="w-full top-0 sticky bg-surface dark:bg-on-background border-b border-outline-variant dark:border-outline z-50">
         <div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max-width mx-auto">
             <a class="font-headline-md text-headline-md font-semibold text-primary dark:text-primary-fixed no-underline hover:opacity-80 transition-opacity" href="index.php">DENIM EDITORIAL</a>
+
             <div class="hidden md:flex gap-8">
-                <a class="font-label-md text-label-md uppercase tracking-widest text-secondary dark:text-secondary-fixed-dim border-b-2 border-secondary pb-1 transition-opacity duration-200 active:opacity-70" href="views/catalogo.php
-                <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="views/producto.php">Tops</a>
-                <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="index.php">Jackets</a>
+                <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="views/catalogo.php?categoria=jeans">Catálogo</a>
+
+                <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="views/catalogo.php?categoria=camisetas">Camisetas</a>
+
+                <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="views/catalogo.php?categoria=chaquetas">Chaquetas</a>
+
                 <a class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-300 transition-opacity duration-200 active:opacity-70" href="views/nosotros.php">Nosotros</a>
             </div>
+            
             <div class="flex items-center gap-6 text-primary dark:text-primary-fixed">
                 <button type="button" class="transition-opacity duration-200 active:opacity-70"><span class="material-symbols-outlined">search</span></button>
-                <a class="transition-opacity duration-200 active:opacity-70 text-current" href="views/carrito_compras.php" aria-label="Carrito"><span class="material-symbols-outlined">shopping_bag</span></a>
+                <?php $cartBasePath = ''; $cartUrl = 'views/carrito_compras.php'; $cartPart = 'button'; include __DIR__ . '/includes/cart-widget.php'; ?>
                 <a class="transition-opacity duration-200 active:opacity-70 text-current" href="views/login.php" aria-label="Cuenta"><span class="material-symbols-outlined">person</span></a>
                 <button type="button" data-theme-toggle class="theme-toggle transition-opacity duration-200 active:opacity-70 text-primary dark:text-primary-fixed" aria-label="Activar modo oscuro" aria-pressed="false">
                     <span class="material-symbols-outlined theme-toggle-icon">dark_mode</span>
@@ -75,7 +80,7 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
                     <div class="absolute bottom-8 left-8 text-white">
-                        <h3 class="font-headline-sm text-headline-sm mb-2">High Rise</h3>
+                        <h3 class="font-headline-sm text-headline-sm mb-2">Talle alto</h3>
                         <a class="font-label-md text-label-md underline underline-offset-4 text-white" href="views/catalogo.php">Comprar Silueta</a>
                     </div>
                 </div>
@@ -87,7 +92,7 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute bottom-8 left-8 text-white">
                         <h3 class="font-headline-sm text-headline-sm mb-2">Skinny</h3>
-                        <a class="font-label-md text-label-md underline underline-offset-4 text-white" href="views/producto.php">Ver Detalles</a>
+                        <a class="font-label-md text-label-md underline underline-offset-4 text-white" href="views/producto.php?id=7">Ver Detalles</a>
                     </div>
                 </div>
                 <!-- Wide Leg Featured -->
@@ -95,7 +100,7 @@
                     <div class="absolute inset-0 flex items-center justify-center p-8 bg-secondary/5 border-2 border-secondary/10">
                         <div class="text-center">
                             <h3 class="font-display-lg text-display-lg-mobile text-primary mb-4 italic">El Nuevo Clásico</h3>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-6">Descubre la libertad de movimiento con nuestra línea Wide Leg.</p>
+                            <p class="font-body-md text-body-md text-on-surface-variant mb-6">Descubre la libertad de movimiento con nuestra línea de pierna ancha.</p>
                             <span class="material-symbols-outlined text-4xl text-secondary">expand</span>
                         </div>
                     </div>
@@ -107,7 +112,7 @@
                     />
                     <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute bottom-8 left-8 text-white">
-                        <h3 class="font-headline-sm text-headline-sm mb-2">Wide Leg</h3>
+                        <h3 class="font-headline-sm text-headline-sm mb-2">Pierna ancha</h3>
                         <a class="font-label-md text-label-md underline underline-offset-4 text-white" href="views/catalogo.php">Explorar</a>
                     </div>
                 </div>
@@ -172,8 +177,8 @@
                 <div class="flex flex-col gap-4">
                     <h4 class="font-label-sm text-label-sm text-primary dark:text-primary-fixed uppercase tracking-widest">Soporte</h4>
                     <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="views/login.php">Newsletter</a>
-                    <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="views/catalogo.php">Shipping</a>
-                    <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="views/login.php">Contact</a>
+                    <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="views/catalogo.php">Envíos</a>
+                    <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="views/login.php">Contacto</a>
                 </div>
             </div>
             <div class="flex flex-col justify-between items-start md:items-end">
@@ -184,10 +189,10 @@
                 </div>
                 <div class="text-left md:text-right">
                     <div class="flex flex-wrap gap-4 mb-4 justify-start md:justify-end">
-                        <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary" href="views/login.php">Privacy</a>
-                        <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary" href="views/login.php">Terms</a>
+                        <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary" href="views/login.php">Privacidad</a>
+                        <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container hover:text-secondary" href="views/login.php">Términos</a>
                     </div>
-                    <p class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container opacity-60">© 2024 DENIM EDITORIAL. ALL RIGHTS RESERVED.</p>
+                    <p class="font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container opacity-60">© 2024 DENIM EDITORIAL. TODOS LOS DERECHOS RESERVADOS.</p>
                 </div>
             </div>
         </div>
@@ -212,6 +217,7 @@
             observer.observe(section);
         });
     </script>
+    <?php $cartBasePath = ''; $cartUrl = 'views/carrito_compras.php'; $cartPart = 'modal'; include __DIR__ . '/includes/cart-widget.php'; ?>
     <script src="js/theme.js"></script>
 </body>
 

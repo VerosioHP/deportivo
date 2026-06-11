@@ -3,7 +3,7 @@
 $host = "localhost";
 $dbname = "majestic";
 $user = "root";
-$password = "admin";
+$password = "";
 
 try {
 
