@@ -5,6 +5,8 @@
 
 $showAddButton = $showAddButton ?? true;
 $tallaDefault = $producto['tallas'][0] ?? 'M';
+$desdeVistas = $desdeVistas ?? (!empty($authInViews) || str_contains(str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? ''), '/views/'));
+$imagenUrl = Producto::urlImagen($producto['imagen_principal'], $desdeVistas);
 
 ?>
 <article
@@ -17,9 +19,18 @@ $tallaDefault = $producto['tallas'][0] ?? 'M';
     <a href="producto.php?id=<?= (int) $producto['id'] ?>" class="block text-inherit no-underline hover:opacity-95 transition-opacity">
         <div class="aspect-[3/4] mb-6 overflow-hidden bg-surface-container relative">
             <img alt="<?= htmlspecialchars($producto['nombre']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                src="<?= htmlspecialchars($producto['imagen_principal']) ?>"
+                src="<?= htmlspecialchars($imagenUrl) ?>"
             />
             <span class="absolute top-4 left-4 bg-surface px-3 py-1 font-label-sm text-label-sm uppercase tracking-widest"><?= htmlspecialchars(Producto::etiquetaStock($producto['stock_estado'])) ?></span>
+            <?php if (!empty($esAdmin)): ?>
+            <button type="button"
+                class="absolute top-4 right-4 z-10 flex items-center gap-1 bg-primary text-on-primary px-3 py-2 font-label-sm text-label-sm uppercase tracking-widest hover:bg-secondary transition-colors"
+                data-admin-edit="<?= (int) $producto['id'] ?>"
+                title="Editar producto">
+                <span class="material-symbols-outlined text-base">edit</span>
+                Editar
+            </button>
+            <?php endif; ?>
         </div>
         <div class="space-y-1">
             <h2 class="font-headline-sm text-headline-sm"><?= htmlspecialchars($producto['nombre']) ?></h2>
@@ -32,7 +43,7 @@ $tallaDefault = $producto['tallas'][0] ?? 'M';
             <?php foreach ($producto['tallas'] as $talla): ?>
             <?php $activa = $talla === $tallaDefault; ?>
             <button type="button"
-                class="card-size-btn min-w-10 h-10 px-2 flex items-center justify-center font-label-md text-label-md transition-colors <?= $activa ? 'bg-secondary text-on-primary border border-secondary' : 'border border-outline-variant hover:border-secondary' ?>">
+                class="card-size-btn min-w-10 h-10 px-2 flex items-center justify-center font-label-md text-label-md transition-colors <?= $activa ? 'bg-secondary text-on-secondary border border-secondary' : 'border border-outline-variant hover:border-secondary' ?>">
                 <?= htmlspecialchars($talla) ?>
             </button>
             <?php endforeach; ?>
@@ -46,7 +57,7 @@ $tallaDefault = $producto['tallas'][0] ?? 'M';
         data-product-id="<?= (int) $producto['id'] ?>"
         data-product-nombre="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES) ?>"
         data-product-precio="<?= (float) $producto['precio'] ?>"
-        data-product-imagen="<?= htmlspecialchars($producto['imagen_principal'], ENT_QUOTES) ?>"
+        data-product-imagen="<?= htmlspecialchars($imagenUrl, ENT_QUOTES) ?>"
         data-product-talla="<?= htmlspecialchars($tallaDefault, ENT_QUOTES) ?>"
         data-product-lavado="<?= htmlspecialchars($producto['lavado'] ?? '', ENT_QUOTES) ?>"
         data-product-fit="<?= htmlspecialchars($producto['fit'] ?? '', ENT_QUOTES) ?>"

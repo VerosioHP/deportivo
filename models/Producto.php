@@ -251,4 +251,203 @@ class Producto
 
         return $mapa[$fit] ?? $fit;
     }
+
+    public static function urlImagen(string $imagen, bool $desdeVistas = false): string
+    {
+        if (preg_match('#^https?://#i', $imagen) || str_starts_with($imagen, '//')) {
+            return $imagen;
+        }
+
+        return ($desdeVistas ? '../' : '') . ltrim($imagen, '/');
+    }
+
+    public static function listarCategorias(): array
+    {
+        global $conexion;
+
+        return $conexion->query('SELECT id, nombre, slug FROM categorias ORDER BY id ASC')->fetchAll();
+    }
+
+    public static function obtenerPorIdAdmin(int $id): ?array
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare(
+            'SELECT p.*, c.nombre AS categoria_nombre, c.slug AS categoria_slug
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.id = :id
+             LIMIT 1'
+        );
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $producto = $stmt->fetch();
+
+        if (!$producto) {
+            return null;
+        }
+
+        $producto['tallas'] = self::obtenerTallas($id);
+        $producto['imagenes'] = self::obtenerImagenes($id);
+
+        return $producto;
+    }
+
+    public static function actualizar(int $id, array $datos): bool
+    {
+        global $conexion;
+
+        $slug = self::generarSlugUnico($datos['nombre'], $id);
+
+        $stmt = $conexion->prepare(
+            'UPDATE productos SET
+                categoria_id = :categoria_id,
+                nombre = :nombre,
+                slug = :slug,
+                descripcion = :descripcion,
+                precio = :precio,
+                imagen_principal = :imagen_principal,
+                lavado = :lavado,
+                fit = :fit,
+                material_info = :material_info,
+                stock_estado = :stock_estado,
+                activo = :activo
+             WHERE id = :id'
+        );
+
+        $stmt->execute([
+            ':id' => $id,
+            ':categoria_id' => (int) $datos['categoria_id'],
+            ':nombre' => $datos['nombre'],
+            ':slug' => $slug,
+            ':descripcion' => $datos['descripcion'],
+            ':precio' => (float) $datos['precio'],
+            ':imagen_principal' => $datos['imagen_principal'],
+            ':lavado' => $datos['lavado'] ?: null,
+            ':fit' => $datos['fit'] ?: null,
+            ':material_info' => $datos['material_info'] ?: null,
+            ':stock_estado' => $datos['stock_estado'],
+            ':activo' => !empty($datos['activo']) ? 1 : 0,
+        ]);
+
+        self::sincronizarTallas($id, $datos['tallas']);
+
+        return true;
+    }
+
+    public static function crear(array $datos): int
+    {
+        global $conexion;
+
+        $slug = self::generarSlugUnico($datos['nombre']);
+
+        $stmt = $conexion->prepare(
+            'INSERT INTO productos
+            (categoria_id, nombre, slug, descripcion, precio, imagen_principal, lavado, fit, material_info, stock_estado, activo)
+            VALUES
+            (:categoria_id, :nombre, :slug, :descripcion, :precio, :imagen_principal, :lavado, :fit, :material_info, :stock_estado, :activo)'
+        );
+
+        $stmt->execute([
+            ':categoria_id' => (int) $datos['categoria_id'],
+            ':nombre' => $datos['nombre'],
+            ':slug' => $slug,
+            ':descripcion' => $datos['descripcion'],
+            ':precio' => (float) $datos['precio'],
+            ':imagen_principal' => $datos['imagen_principal'],
+            ':lavado' => $datos['lavado'] ?: null,
+            ':fit' => $datos['fit'] ?: null,
+            ':material_info' => $datos['material_info'] ?: null,
+            ':stock_estado' => $datos['stock_estado'],
+            ':activo' => !empty($datos['activo']) ? 1 : 0,
+        ]);
+
+        $id = (int) $conexion->lastInsertId();
+        self::sincronizarTallas($id, $datos['tallas']);
+
+        return $id;
+    }
+
+    public static function desactivar(int $id): bool
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare('UPDATE productos SET activo = 0 WHERE id = :id');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+    private static function sincronizarTallas(int $productoId, array $tallas): void
+    {
+        global $conexion;
+
+        $conexion->prepare('DELETE FROM producto_tallas WHERE producto_id = :id')
+            ->execute([':id' => $productoId]);
+
+        $stmt = $conexion->prepare(
+            'INSERT INTO producto_tallas (producto_id, talla) VALUES (:producto_id, :talla)'
+        );
+
+        foreach ($tallas as $talla) {
+            $talla = trim($talla);
+            if ($talla === '') {
+                continue;
+            }
+            $stmt->execute([
+                ':producto_id' => $productoId,
+                ':talla' => $talla,
+            ]);
+        }
+    }
+
+    private static function generarSlugUnico(string $nombre, ?int $excluirId = null): string
+    {
+        global $conexion;
+
+        $base = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $nombre), '-'));
+
+        if ($base === '') {
+            $base = 'producto';
+        }
+
+        $slug = $base;
+        $contador = 1;
+
+        while (self::slugExiste($slug, $excluirId)) {
+            $slug = $base . '-' . $contador;
+            $contador++;
+        }
+
+        return $slug;
+    }
+
+    private static function slugExiste(string $slug, ?int $excluirId = null): bool
+    {
+        global $conexion;
+
+        $sql = 'SELECT id FROM productos WHERE slug = :slug';
+        if ($excluirId) {
+            $sql .= ' AND id != :id';
+        }
+
+        $stmt = $conexion->prepare($sql . ' LIMIT 1');
+        $stmt->bindParam(':slug', $slug, PDO::PARAM_STR);
+
+        if ($excluirId) {
+            $stmt->bindParam(':id', $excluirId, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+
+        return (bool) $stmt->fetch();
+    }
+
+    public static function parseTallasInput(string $input): array
+    {
+        $tallas = array_map('trim', explode(',', $input));
+
+        return array_values(array_filter($tallas, fn ($t) => $t !== ''));
+    }
 }

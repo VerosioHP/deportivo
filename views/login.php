@@ -1,53 +1,43 @@
+<?php
+require_once __DIR__ . '/../includes/sport-images.php';
+?>
 <!DOCTYPE html>
 
-<html class="light" lang="es">
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Iniciar sesión | DENIM EDITORIAL</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet" />
-    <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <title>Iniciar sesión | DEPORTIVO</title>
+    <?php include __DIR__ . '/../includes/design-head.php'; ?>
     <script src="../js/theme-init.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="../js/login.js"></script>
+    <script src="../js/tailwind-theme.js"></script>
+    <link rel="stylesheet" href="../css/site.css">
     <link rel="stylesheet" href="../css/login.css">
     <link rel="stylesheet" href="../css/theme.css">
 </head>
 
 <body class="bg-surface dark:bg-on-background text-on-surface dark:text-inverse-on-surface font-body-md antialiased overflow-x-hidden transition-colors duration-300">
-    <!-- Top Navigation (Reduced Shell for Transactional Focus) -->
-    <header class="sticky top-0 w-full bg-surface dark:bg-on-background border-b border-outline-variant dark:border-outline z-50">
-        <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-            <a class="text-headline-sm font-headline-sm tracking-tight text-primary dark:text-primary-fixed no-underline hover:opacity-80 transition-opacity" href="../index.php">DENIM EDITORIAL</a>
-            
-            <div class="flex gap-4 items-center text-primary dark:text-primary-fixed">
-                <span class="material-symbols-outlined cursor-pointer hover:text-secondary dark:hover:text-secondary-fixed transition-colors" data-icon="search">search</span>
-                <?php $cartBasePath = '../'; $cartUrl = 'carrito_compras.php'; $cartPart = 'button'; include __DIR__ . '/../includes/cart-widget.php'; ?>
-                <a class="material-symbols-outlined cursor-pointer hover:text-secondary dark:hover:text-secondary-fixed transition-colors text-current no-underline" href="login.php" data-icon="person" aria-label="Cuenta">person</a>
-                <button type="button" data-theme-toggle class="theme-toggle cursor-pointer transition-opacity duration-200 active:opacity-70 text-primary dark:text-primary-fixed" aria-label="Activar modo oscuro" aria-pressed="false">
-                    <span class="material-symbols-outlined theme-toggle-icon">dark_mode</span>
-                </button>
-            </div>
-        </div>
-    </header>
+<?php
+$navInViews = true;
+$activePage = 'login';
+$cartBasePath = '../';
+$cartUrl = 'carrito_compras.php';
+?>
+    <?php include __DIR__ . '/../includes/site-nav.php'; ?>
     <main class="min-h-[calc(100vh-80px)] flex items-center justify-center py-10 md:py-20 px-margin-mobile md:px-margin-desktop">
         <div class="w-full max-w-[1100px] grid grid-cols-1 md:grid-cols-2 bg-surface-container-low dark:bg-tertiary-container rounded-lg overflow-hidden editorial-shadow">
             <!-- Visual Editorial Side -->
             <div class="relative hidden md:block overflow-hidden">
-                <img class="absolute inset-0 w-full h-full object-cover" data-alt="A cinematic, high-fashion editorial photograph of a person wearing premium raw selvedge denim jeans leaning against a weathered stone wall. The lighting is soft and golden, characteristic of a late afternoon glow, highlighting the tactile texture of the fabric and the precision of the stitching. The color palette is composed of deep indigo blues, warm creams, and earthy ochre tones, creating a sophisticated and grounded atmosphere that reflects a slow-living aesthetic."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEWRxzOiPh0v3pNEu4UXvLwlzaY92PRu7Ik5yC_xqfqFu9GOKiRVbYuX5keLNXf20mKYuCVRigVdE3soDo5PtN20E7R_JHoSK72AAO33W5CbZeXM_8X1YyXNBJTrbh57vc1tFTk8Y41dg38dUqqLDAfr_QaV-iruP5zlPiHaFhq5DNtYOyU3Zyrdc34uDGNNeW5uh1hNbs0Zk3I49PKBwpQuOrEUicJKa3mOlsU3jZP9DBZ_ya31uYjigugByLFKad_NoYgk72B9Pg"
+                <img class="absolute inset-0 w-full h-full object-cover" alt="Atleta entrenando con ropa deportiva"
+                    src="<?= deportivo_img('login_side', 'md') ?>"
                 />
-                <div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
-                <div class="absolute bottom-12 left-12 right-12 text-white">
-                    <p class="font-label-sm text-label-sm tracking-[0.2em] mb-4 opacity-80 uppercase">El oficio del denim</p>
-                    <h2 class="font-headline-md text-headline-md mb-6 leading-tight italic">"El verdadero estilo es una inversión en calidad que madura con el tiempo."</h2>
-                    <div class="h-px w-24 bg-white/40"></div>
+                <div class="absolute inset-0 bg-white/50"></div>
+                <div class="absolute bottom-12 left-12 right-12 text-on-surface">
+                    <p class="font-label-sm text-label-sm tracking-[0.2em] mb-4 opacity-80 uppercase">Ropa que rinde</p>
+                    <h2 class="font-headline-md text-headline-md mb-6 leading-tight uppercase">"El mejor equipo es el que te hace sentir invencible."</h2>
+                    <div class="h-px w-24 bg-outline-variant"></div>
                 </div>
             </div>
             <!-- Form Side -->
@@ -57,7 +47,7 @@
                     <div class="space-y-8" id="login-section">
                         <div class="space-y-2">
                             <h1 class="font-headline-sm text-headline-sm text-primary">Bienvenido de nuevo</h1>
-                            <p class="font-body-md text-on-surface-variant">Inicia sesión para acceder a tu guardarropa curado.</p>
+                            <p class="font-body-md text-on-surface-variant">Inicia sesión para acceder a tu cuenta y pedidos.</p>
                         </div>
                         <form action="../controllers/loginController.php" method="post" class="space-y-6">
                             <div class="space-y-4">
@@ -85,7 +75,7 @@
                                     />
                                 </div>
                             </div>
-                            <button class="w-full py-4 bg-primary text-white font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
+                            <button class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
                                     INICIAR SESIÓN
                                 </button>
                         </form>
@@ -118,15 +108,15 @@
                                 </button>
                         </div>
                         <p class="text-center font-body-md text-on-surface-variant">
-                            ¿Nuevo en Denim Editorial?
+                            ¿Nuevo en Deportivo?
                             <button class="text-secondary font-label-md text-label-md hover:underline ml-1" onclick="toggleAuth('register')">Crear cuenta</button>
                         </p>
                     </div>
                     <!-- Register Form (Hidden Initially) -->
                     <div class="hidden space-y-8" id="register-section">
                         <div class="space-y-2">
-                            <h1 class="font-headline-sm text-headline-sm text-primary">Únete a la edición</h1>
-                            <p class="font-body-md text-on-surface-variant">Crea tu perfil de estilo personal.</p>
+                            <h1 class="font-headline-sm text-headline-sm text-primary">Únete al equipo</h1>
+                            <p class="font-body-md text-on-surface-variant">Crea tu cuenta y empieza a equiparte.</p>
                         </div>
                         <form action="../controllers/registerController.php" method="post" class="space-y-6">
                             <div class="space-y-4">
@@ -165,7 +155,7 @@
                                 <input class="mt-1 h-4 w-4 rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox" />
                                 <label class="font-label-sm text-label-sm text-on-surface-variant">Acepto los <a class="underline" href="login.php">Términos de servicio</a> y la <a class="underline" href="login.php">Política de privacidad</a>.</label>
                             </div>
-                            <button class="w-full py-4 bg-primary text-white font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
+                            <button class="w-full py-4 bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-all active:scale-[0.98] duration-200" type="submit">
                                     CREAR CUENTA
                                 </button>
                         </form>
@@ -206,16 +196,7 @@
             </div>
         </div>
     </main>
-    <!-- Simple Minimal Footer -->
-    <footer class="bg-surface-container-low dark:bg-tertiary-container w-full border-t border-outline-variant dark:border-outline">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto border-t border-outline-variant/30">
-            <span class="font-label-sm text-label-sm text-on-tertiary-fixed-variant uppercase">© 2024 DENIM EDITORIAL. TODOS LOS DERECHOS RESERVADOS.</span>
-            <div class="flex gap-6">
-                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Contacto</a>
-                <a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-all" href="login.php">Privacidad</a>
-            </div>
-        </div>
-    </footer>
+    <?php include __DIR__ . '/../includes/site-footer.php'; ?>
     <script>
         function toggleAuth(type) {
             const container = document.getElementById('auth-container');
@@ -241,7 +222,7 @@
 
         // Simple parallax effect for the visual side
         document.addEventListener('mousemove', (e) => {
-            const img = document.querySelector('img[data-alt]');
+            const img = document.querySelector('.hidden.md\\:block img');
             if (img && window.innerWidth >= 768) {
                 const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
                 const moveY = (e.clientY - window.innerHeight / 2) * 0.01;

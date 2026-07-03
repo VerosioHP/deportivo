@@ -1,5 +1,5 @@
 (function () {
-    var STORAGE_KEY = "denim-editorial-theme";
+    var STORAGE_KEY = "deportivo-theme";
 
     function getTheme() {
         return document.documentElement.classList.contains("dark") ? "dark" : "light";

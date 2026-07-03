@@ -31,7 +31,7 @@ if ($cartPart === 'button' || $cartPart === 'all') :
 
     <div class="flex-1 overflow-y-auto px-margin-mobile md:px-8">
         <p id="cart-modal-empty" class="font-body-md text-body-md text-on-surface-variant py-12 text-center hidden">
-            Tu bolsa está vacía. Explora el catálogo y añade piezas editoriales.
+            Tu bolsa está vacía. Explora el catálogo y equípate para tu próximo entrenamiento.
         </p>
         <div id="cart-modal-items"></div>
     </div>

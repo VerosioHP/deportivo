@@ -21,80 +21,174 @@ html.dark {
     font-size: 24px;
 }
 
+/* Modo claro: primary = blanco en fondos, negro en textos */
+html:not(.dark) .text-primary,
+html:not(.dark) .text-primary-fixed,
+html:not(.dark) .text-headline-md.text-primary,
+html:not(.dark) .text-headline-sm.text-primary,
+html:not(.dark) .text-display-lg.text-primary {
+    color: #0A0A0A;
+}
+
+html:not(.dark) .bg-primary {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E5E5;
+}
+
+html:not(.dark) .bg-primary.text-on-primary,
+html:not(.dark) .bg-primary .text-on-primary,
+html:not(.dark) button.bg-primary,
+html:not(.dark) a.bg-primary {
+    color: #0A0A0A;
+}
+
+html:not(.dark) .text-on-primary {
+    color: #0A0A0A;
+}
+
+html:not(.dark) .border-primary {
+    border-color: #0A0A0A;
+}
+
+html:not(.dark) .bg-primary\/10 {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+html:not(.dark) .bg-primary\/20 {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+html:not(.dark) .bg-primary\/30 {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+html:not(.dark) .bg-primary\/40 {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+html:not(.dark) .bg-primary\/50 {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+html:not(.dark) .from-primary\/60 {
+    --tw-gradient-from: rgba(0, 0, 0, 0.55);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+html:not(.dark) .hover\:bg-primary:hover {
+    background-color: #FFFFFF;
+    color: #0A0A0A;
+}
+
+html:not(.dark) .hover\:text-primary:hover {
+    color: #0A0A0A;
+}
+
+html:not(.dark) .bg-primary-container,
+html:not(.dark) .hover\:bg-primary-container:hover {
+    background-color: #F5F5F5;
+}
+
+/* Botones verdes sin borde blanco */
+html:not(.dark) .bg-secondary {
+    border-color: transparent;
+}
+
+html:not(.dark) .bg-secondary.text-on-secondary,
+html:not(.dark) .text-on-secondary {
+    color: #FFFFFF;
+}
+
+/* Modo oscuro */
 html.dark body {
-    background-color: #151614;
-    color: #f2f0f0;
+    background-color: #0A0A0A;
+    color: #FAFAFA;
 }
 
 html.dark .bg-surface,
 html.dark .bg-background,
 html.dark .bg-surface-bright {
-    background-color: #1b1c1c;
+    background-color: #0A0A0A;
 }
 
 html.dark .bg-surface-container {
-    background-color: #2a2a28;
+    background-color: #171717;
 }
 
 html.dark .bg-surface-container-low,
 html.dark .bg-surface-container-high {
-    background-color: #303030;
+    background-color: #171717;
 }
 
 html.dark .bg-surface-dim {
-    background-color: #1b1c1c;
+    background-color: #0A0A0A;
 }
 
 html.dark .bg-white {
-    background-color: #2a2a28;
+    background-color: #171717;
 }
 
-html.dark .text-primary {
-    color: #d5e3ff;
+html.dark .text-primary,
+html.dark .text-primary-fixed {
+    color: #FAFAFA;
+}
+
+html.dark .bg-primary {
+    background-color: #FAFAFA;
+    border-color: #FAFAFA;
+    color: #0A0A0A;
+}
+
+html.dark .text-on-primary {
+    color: #0A0A0A;
 }
 
 html.dark .text-on-surface {
-    color: #f2f0f0;
+    color: #FAFAFA;
 }
 
 html.dark .text-on-background {
-    color: #f2f0f0;
+    color: #FAFAFA;
 }
 
 html.dark .text-on-surface-variant {
-    color: #c8c6c2;
+    color: #A3A3A3;
 }
 
 html.dark .text-headline-md,
 html.dark .text-headline-sm,
 html.dark .text-display-lg,
 html.dark .text-display-lg-mobile {
-    color: #f2f0f0;
+    color: #FAFAFA;
 }
 
 html.dark .border-outline,
 html.dark .border-outline-variant {
-    border-color: #44474d;
+    border-color: #404040;
+}
+
+html.dark .border-primary {
+    border-color: #FAFAFA;
 }
 
 html.dark input,
 html.dark textarea {
-    color: #f2f0f0;
+    color: #FAFAFA;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-    color: #75777e;
+    color: #737373;
 }
 
 html.dark .editorial-shadow {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
 }
 
 html.dark .bg-surface\/80 {
-    background-color: rgba(27, 28, 28, 0.85);
+    background-color: rgba(10, 10, 10, 0.9);
 }
 
 html.dark aside.bg-surface-container-low {
-    background-color: #2a2a28;
+    background-color: #171717;
 }

@@ -1,7 +1,7 @@
 <?php
 
 $host = "localhost";
-$dbname = "majestic";
+$dbname = "deportivo";
 $user = "root";
 $password = "";
 

@@ -1,4 +1,4 @@
--- Tablas de productos para DENIM EDITORIAL
+-- Tablas de productos para DEPORTIVO
 -- Importar en Laragon: mysql -u root majestic < database/productos.sql
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -62,9 +62,9 @@ CREATE TABLE IF NOT EXISTS `producto_tallas` (
 -- --------------------------------------------------------
 
 INSERT INTO `categorias` (`id`, `nombre`, `slug`, `descripcion`) VALUES
-(1, 'Jeans', 'jeans', 'Explora nuestra selección curada de denim premium. Desde cortes rectos de herencia hasta siluetas arquitectónicas modernas.'),
-(2, 'Camisetas', 'camisetas', 'Prendas superiores esenciales confeccionadas en algodón orgánico con caída premium y acabado editorial.'),
-(3, 'Chaquetas', 'chaquetas', 'Prendas exteriores sastreadas diseñadas para complementar nuestra colección denim con sofisticación atemporal.');
+(1, 'Pantalonetas', 'pantalonetas', 'Pantalonetas deportivas para entrenamiento, running y competición. Tejidos ligeros, secado rápido y máxima libertad de movimiento.'),
+(2, 'Camisetas', 'camisetas', 'Camisetas deportivas con tecnología Dry-Fit. Transpirables, cómodas y diseñadas para el máximo rendimiento.'),
+(3, 'Pantalonetas Pro', 'pantalonetas-pro', 'Pantalonetas de competición con tejidos de compresión y ajuste ergonómico.');
 
 -- --------------------------------------------------------
 -- Productos: Jeans

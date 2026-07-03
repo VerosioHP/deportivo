@@ -267,10 +267,17 @@
         const subtotalEl = document.getElementById('cart-summary-subtotal');
         const shippingEl = document.getElementById('cart-summary-shipping');
         const totalEl = document.getElementById('cart-summary-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
 
         if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
         if (shippingEl) shippingEl.textContent = formatPrice(shipping);
         if (totalEl) totalEl.textContent = formatPrice(total);
+
+        if (checkoutBtn) {
+            const hasItems = subtotal > 0;
+            checkoutBtn.classList.toggle('opacity-50', !hasItems);
+            checkoutBtn.classList.toggle('pointer-events-none', !hasItems);
+        }
     }
 
     function openModal() {
@@ -400,5 +407,8 @@
         openModal,
         closeModal,
         formatPrice,
+        getSubtotal: () => getSubtotal(getItems()),
+        getShipping: () => getShipping(getSubtotal(getItems())),
+        getTotal: () => getSubtotal(getItems()) + getShipping(getSubtotal(getItems())),
     };
 })();
