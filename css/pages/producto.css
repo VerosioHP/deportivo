@@ -1,0 +1,17 @@
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.size-guide-table th,
+.size-guide-table td {
+    white-space: nowrap;
+}
+
+.size-guide-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--color-secondary) 8%, transparent);
+}

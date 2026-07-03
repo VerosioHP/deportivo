@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/moneda.php';
 
 class Producto
 {
@@ -125,7 +126,7 @@ class Producto
         global $conexion;
 
         $stmt = $conexion->prepare(
-            'SELECT url, alt_text FROM producto_imagenes
+            'SELECT id, url, alt_text, orden FROM producto_imagenes
              WHERE producto_id = :producto_id
              ORDER BY orden ASC'
         );
@@ -155,7 +156,7 @@ class Producto
 
     public static function formatearPrecio(float $precio): string
     {
-        return '$' . number_format($precio, 2, '.', '');
+        return deportivo_formatear_precio($precio);
     }
 
     public static function parseMaterialInfo(?string $materialInfo): array
@@ -256,6 +257,10 @@ class Producto
     {
         if (preg_match('#^https?://#i', $imagen) || str_starts_with($imagen, '//')) {
             return $imagen;
+        }
+
+        if (function_exists('deportivo_upload_url')) {
+            return deportivo_upload_url($imagen);
         }
 
         return ($desdeVistas ? '../' : '') . ltrim($imagen, '/');
@@ -449,5 +454,48 @@ class Producto
         $tallas = array_map('trim', explode(',', $input));
 
         return array_values(array_filter($tallas, fn ($t) => $t !== ''));
+    }
+
+    public static function actualizarImagenPrincipal(int $id, string $imagenPath): bool
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare(
+            'UPDATE productos SET imagen_principal = :imagen WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':imagen' => $imagenPath,
+        ]);
+    }
+
+    public static function actualizarImagenGaleria(int $imagenId, string $url): bool
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare(
+            'UPDATE producto_imagenes SET url = :url WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            ':id' => $imagenId,
+            ':url' => $url,
+        ]);
+    }
+
+    public static function obtenerImagenGaleria(int $imagenId): ?array
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare(
+            'SELECT id, producto_id, url, alt_text FROM producto_imagenes WHERE id = :id LIMIT 1'
+        );
+        $stmt->bindParam(':id', $imagenId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+
+        return $row ?: null;
     }
 }

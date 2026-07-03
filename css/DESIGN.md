@@ -33,6 +33,9 @@ colors:
   on-error: '#690005'
   error-container: '#93000a'
   on-error-container: '#ffdad6'
+  accent: '#DFFF00'
+  accent-on: '#0D0D0E'
+  accent-dim: '#5C6200'
   primary-fixed: '#e5e2e3'
   primary-fixed-dim: '#c8c6c7'
   on-primary-fixed: '#1c1b1c'
@@ -163,3 +166,72 @@ Diagonal cuts (45-degree chamfers) may be used sparingly on secondary buttons or
 *   **Chips/Tags:** Used for "New Arrival" or "Performance Tech." These use the monospaced `label-caps` font, styled as small rectangular blocks with high-contrast fills (Black/White).
 *   **Navigation:** A persistent, ultra-thin top bar. Use the `label-caps` font for nav items to maintain a technical, streamlined look.
 *   **Price Points:** Always displayed in a larger weight of the body font or a medium weight of the headline font, never italicized, to ensure immediate clarity.
+
+---
+
+## Mapeo al proyecto DEPORTIVO
+
+Esta sección documenta cómo los tokens del design system se aplican en el código actual **sin cambiar la lógica funcional**.
+
+### Estructura de archivos
+
+```
+css/
+├── DESIGN.md              ← Este documento (fuente de verdad)
+├── site.css               ← Punto de entrada (importa core + components)
+├── core/
+│   ├── tokens.css         ← Variables CSS (--color-accent, surfaces…)
+│   ├── icons.css          ← Material Symbols
+│   └── theme.css          ← Overrides light/dark
+├── components/
+│   ├── shared.css         ← Marquee, sport-cards, tech-pills…
+│   └── cta.css            ← CTAs Volt con texto legible
+└── pages/
+    ├── index.css
+    ├── catalogo.css
+    ├── login.css
+    ├── nosotros.css
+    ├── producto.css
+
+js/
+├── theme/
+│   ├── init.js
+│   ├── tokens.js
+│   ├── config.js
+│   └── toggle.js
+├── pages/
+│   ├── cart.js
+│   ├── checkout.js
+│   ├── catalogo-filters.js
+│   └── admin.js
+
+includes/
+└── design-head.php        ← Carga unificada de assets de diseño
+```
+
+### Mapeo de tokens Tailwind
+
+| Token en markup | Rol en Kinetic Noir | Valor |
+|---|---|---|
+| `secondary` | Accent Electric Volt (CTAs, estados activos) | `#DFFF00` |
+| `on-secondary` | Texto sobre Volt | `#0D0D0E` |
+| `primary` | Texto / chrome principal (light) | `#12131A` |
+| `background` / `surface` | Fondo base | `#F4F4F6` (light) / `#12131A` (dark) |
+| `surface-container-*` | Capas tonales (cards, sidebars) | Escala Tech-Noir |
+| `outline-variant` | Bordes sutiles | `#C7C6CA` (light) / `#46464A` (dark) |
+
+> **Nota:** El acento Volt se mapea a `secondary` porque el markup existente ya usa `bg-secondary`, `text-secondary` y `border-secondary` para CTAs y estados activos. En modo claro, `text-secondary` usa `--color-accent-dim` (#5C6200) para legibilidad sobre fondos claros.
+
+### Tipografía
+
+| Clase Tailwind | Fuente | Uso |
+|---|---|---|
+| `font-display-lg`, `font-headline-*` | Anybody | Titulares |
+| `font-body-*` | Hanken Grotesk | Párrafos, UI |
+| `font-label-*` | JetBrains Mono | Labels, nav, botones |
+
+### Modo claro / oscuro
+
+- **Default dark-first:** Tech-Noir con fondo `#12131A` y acento Volt.
+- **Modo claro:** Fondo off-white `#F4F4F6`, texto charcoal, Volt solo en fondos de botón y bordes activos.
+- Toggle: `js/theme/toggle.js` + variables en `css/core/tokens.css`.

@@ -1,0 +1,39 @@
+/**
+ * CTAs sobre Electric Volt — garantiza texto legible
+ * (anula overrides de headline/primary en light y dark)
+ */
+
+.bg-secondary,
+button.bg-secondary,
+a.bg-secondary,
+[type="submit"].bg-secondary {
+    background-color: var(--color-accent);
+}
+
+.bg-secondary.text-on-secondary,
+.bg-secondary.text-on-primary,
+a.bg-secondary.text-on-secondary,
+button.bg-secondary.text-on-secondary,
+[type="submit"].bg-secondary.text-on-secondary,
+html.dark .bg-secondary.text-on-secondary,
+html.dark .bg-secondary.text-on-primary,
+html:not(.dark) .bg-secondary.text-on-secondary,
+html:not(.dark) .bg-secondary.text-on-primary,
+html.dark .bg-secondary.text-on-secondary.text-headline-sm,
+html.dark .bg-secondary.text-on-secondary.font-headline-sm,
+html:not(.dark) .bg-secondary.text-on-secondary.text-headline-sm,
+html:not(.dark) .bg-secondary.text-on-secondary.font-headline-sm {
+    color: var(--color-accent-on);
+}
+
+.hover\:bg-secondary:hover,
+a.hover\:bg-secondary:hover,
+button.hover\:bg-secondary:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-on);
+}
+
+.hover\:bg-secondary:hover .text-on-primary,
+.hover\:bg-secondary:hover.text-on-primary {
+    color: var(--color-accent-on);
+}

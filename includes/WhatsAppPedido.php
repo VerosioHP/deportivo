@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/Producto.php';
+require_once __DIR__ . '/../config/moneda.php';
 
 class WhatsAppPedido
 {
@@ -45,8 +46,8 @@ class WhatsAppPedido
             $lineas[] = '*' . $num . '. ' . self::linea($item['nombre'] ?? 'Producto') . '*';
             $lineas[] = '   Talla: ' . self::linea($item['talla'] ?? '-');
             $lineas[] = '   Cantidad: ' . $cantidad;
-            $lineas[] = '   Precio unit.: $' . number_format($precio, 2, '.', '');
-            $lineas[] = '   Subtotal: $' . number_format($subtotalItem, 2, '.', '');
+            $lineas[] = '   Precio unit.: ' . deportivo_formatear_precio($precio);
+            $lineas[] = '   Subtotal: ' . deportivo_formatear_precio($subtotalItem);
 
             $detalles = array_filter([
                 !empty($item['categoria']) ? 'Categoría: ' . $item['categoria'] : '',
@@ -67,9 +68,9 @@ class WhatsAppPedido
 
         $lineas[] = '';
         $lineas[] = '💰 *RESUMEN*';
-        $lineas[] = 'Subtotal: $' . number_format($subtotal, 2, '.', '');
-        $lineas[] = 'Envío: $' . number_format($envioCosto, 2, '.', '');
-        $lineas[] = '*Total: $' . number_format($total, 2, '.', '') . '*';
+        $lineas[] = 'Subtotal: ' . deportivo_formatear_precio($subtotal);
+        $lineas[] = 'Envío: ' . deportivo_formatear_precio($envioCosto);
+        $lineas[] = '*Total: ' . deportivo_formatear_precio($total) . '*';
         $lineas[] = '';
         $lineas[] = 'Pedido registrado en la tienda. Por favor confirmar disponibilidad y envío.';
 

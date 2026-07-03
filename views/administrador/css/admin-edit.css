@@ -1,0 +1,99 @@
+/* Modo administrador — edición inline */
+
+.admin-mode [data-admin-site-image],
+.admin-mode [data-admin-product-image],
+.admin-mode [data-admin-gallery-image] {
+    cursor: pointer;
+    position: relative;
+}
+
+.admin-mode [data-admin-site-image]::after,
+.admin-mode [data-admin-product-image]::after,
+.admin-mode [data-admin-gallery-image]::after {
+    content: 'photo_camera';
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    background: rgba(13, 13, 14, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.admin-mode [data-admin-site-image]:hover::after,
+.admin-mode [data-admin-product-image]:hover::after,
+.admin-mode [data-admin-gallery-image]:hover::after {
+    opacity: 1;
+}
+
+.admin-mode .product-card[data-admin-edit-card] {
+    cursor: pointer;
+}
+
+.admin-mode .product-card[data-admin-edit-card] .aspect-\[3\/4\]::before {
+    content: 'edit';
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.125rem;
+    color: var(--color-accent-on);
+    background: var(--color-accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.admin-mode .product-card[data-admin-edit-card]:hover .aspect-\[3\/4\]::before {
+    opacity: 1;
+}
+
+.admin-mode [data-admin-edit-title] {
+    cursor: pointer;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.2s;
+}
+
+.admin-mode [data-admin-edit-title]:hover {
+    border-bottom-color: var(--color-accent);
+}
+
+.admin-image-modal-preview {
+    max-height: 280px;
+    object-fit: contain;
+    background: var(--color-surface-container);
+}
+
+.admin-modal-panel {
+    min-height: 0;
+    overscroll-behavior: contain;
+}
+
+.admin-modal-body {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-modal-body::-webkit-scrollbar-thumb {
+    background: var(--color-outline-variant);
+    border-radius: 3px;
+}
+
+.admin-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}

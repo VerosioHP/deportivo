@@ -1,0 +1,81 @@
+/**
+ * Kinetic Noir — Design tokens
+ * Fuente: css/DESIGN.md
+ */
+:root {
+    /* Accent — Electric Volt */
+    --color-accent: #DFFF00;
+    --color-accent-on: #0D0D0E;
+    --color-accent-dim: #5C6200;
+    --color-accent-container: #E8FFB3;
+    --color-accent-container-on: #2A2D00;
+
+    /* Light mode surfaces */
+    --color-background: #F4F4F6;
+    --color-surface: #FFFFFF;
+    --color-surface-dim: #E8E8EC;
+    --color-surface-container-lowest: #FFFFFF;
+    --color-surface-container-low: #F4F4F6;
+    --color-surface-container: #E8E8EC;
+    --color-surface-container-high: #DCDCE2;
+    --color-surface-container-highest: #CFCFD6;
+
+    /* Light mode content */
+    --color-on-background: #12131A;
+    --color-on-surface: #12131A;
+    --color-on-surface-variant: #46464A;
+    --color-outline: #919094;
+    --color-outline-variant: #C7C6CA;
+
+    /* Primary (text / UI chrome) */
+    --color-primary: #12131A;
+    --color-on-primary: #F4F4F6;
+    --color-primary-container: #E8E8EC;
+    --color-on-primary-container: #12131A;
+
+    /* Error */
+    --color-error: #BA1A1A;
+    --color-on-error: #FFFFFF;
+    --color-error-container: #FFDAD6;
+    --color-on-error-container: #93000A;
+
+    /* Spacing */
+    --spacing-unit: 4px;
+    --spacing-gutter: 24px;
+    --spacing-margin-mobile: 20px;
+    --spacing-margin-desktop: 64px;
+    --spacing-container-max: 1440px;
+
+    /* Shapes — Sharp (0) */
+    --radius-none: 0;
+}
+
+html.dark {
+    /* Dark mode — Tech-Noir (DESIGN.md yaml) */
+    --color-background: #12131A;
+    --color-surface: #12131A;
+    --color-surface-dim: #12131A;
+    --color-surface-container-lowest: #0C0E14;
+    --color-surface-container-low: #1A1B22;
+    --color-surface-container: #1E1F26;
+    --color-surface-container-high: #282A31;
+    --color-surface-container-highest: #33343C;
+
+    --color-on-background: #E2E1EB;
+    --color-on-surface: #E2E1EB;
+    --color-on-surface-variant: #C7C6CA;
+    --color-outline: #919094;
+    --color-outline-variant: #46464A;
+
+    --color-primary: #E2E1EB;
+    --color-on-primary: #0D0D0E;
+    --color-primary-container: #1E1F26;
+    --color-on-primary-container: #C7C6CA;
+
+    --color-accent-dim: #DFFF00;
+
+    --color-error: #FFB4AB;
+    --color-on-error: #690005;
+    --color-error-container: #93000A;
+    --color-on-error-container: #FFDAD6;
+}

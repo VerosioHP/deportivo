@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/database.php';
 
 if (!isset($_SESSION['usuario_id'])) {
 
-    header("Location: ../views/login.php");
+    header("Location: ../views/cliente/views/login.php");
     exit;
 }
 
@@ -32,6 +32,6 @@ if (!$usuario) {
 
     session_destroy();
 
-    header("Location: ../views/login.php");
+    header("Location: ../views/cliente/views/login.php");
     exit;
 }

@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/moneda.php';
 
 class Pedido
 {
@@ -14,7 +15,7 @@ class Pedido
             $subtotal += (float) $item['precio'] * (int) $item['cantidad'];
         }
 
-        $envioCosto = $subtotal >= 300 ? 0.0 : ($subtotal > 0 ? 12.0 : 0.0);
+        $envioCosto = deportivo_calcular_envio($subtotal);
         $total = $subtotal + $envioCosto;
 
         $conexion->beginTransaction();

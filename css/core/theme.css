@@ -1,0 +1,217 @@
+@import url('tokens.css');
+
+html {
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.theme-toggle .material-symbols-outlined {
+    font-size: 24px;
+}
+
+/* ── Light mode overrides ── */
+
+html:not(.dark) .text-primary,
+html:not(.dark) .text-primary-fixed,
+html:not(.dark) .text-headline-md.text-primary,
+html:not(.dark) .text-headline-sm.text-primary,
+html:not(.dark) .text-display-lg.text-primary {
+    color: var(--color-primary);
+}
+
+html:not(.dark) .bg-primary {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-outline-variant);
+}
+
+html:not(.dark) .bg-primary.text-on-primary,
+html:not(.dark) .bg-primary .text-on-primary,
+html:not(.dark) button.bg-primary,
+html:not(.dark) a.bg-primary {
+    color: var(--color-on-primary);
+}
+
+html:not(.dark) .text-on-primary {
+    color: var(--color-on-primary);
+}
+
+html:not(.dark) .border-primary {
+    border-color: var(--color-primary);
+}
+
+html:not(.dark) .bg-primary\/10 {
+    background-color: rgba(18, 19, 26, 0.06);
+}
+
+html:not(.dark) .bg-primary\/20 {
+    background-color: rgba(18, 19, 26, 0.1);
+}
+
+html:not(.dark) .bg-primary\/30 {
+    background-color: rgba(18, 19, 26, 0.15);
+}
+
+html:not(.dark) .bg-primary\/40 {
+    background-color: rgba(18, 19, 26, 0.25);
+}
+
+html:not(.dark) .bg-primary\/50 {
+    background-color: rgba(18, 19, 26, 0.35);
+}
+
+html:not(.dark) .from-primary\/60 {
+    --tw-gradient-from: rgba(18, 19, 26, 0.55);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+html:not(.dark) .hover\:bg-primary:hover {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+html:not(.dark) .hover\:text-primary:hover {
+    color: var(--color-primary);
+}
+
+html:not(.dark) .bg-primary-container,
+html:not(.dark) .hover\:bg-primary-container:hover {
+    background-color: var(--color-primary-container);
+}
+
+/* Accent legible en fondos claros */
+html:not(.dark) .text-secondary {
+    color: var(--color-accent-dim);
+}
+
+html:not(.dark) .bg-secondary {
+    background-color: var(--color-accent);
+    border-color: transparent;
+}
+
+html:not(.dark) .bg-secondary.text-on-secondary,
+html:not(.dark) .text-on-secondary {
+    color: var(--color-accent-on);
+}
+
+html:not(.dark) ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-on);
+}
+
+/* ── Dark mode overrides ── */
+
+html.dark body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+}
+
+html.dark .bg-surface,
+html.dark .bg-background,
+html.dark .bg-surface-bright {
+    background-color: var(--color-background);
+}
+
+html.dark .bg-surface-container {
+    background-color: var(--color-surface-container);
+}
+
+html.dark .bg-surface-container-low,
+html.dark .bg-surface-container-high {
+    background-color: var(--color-surface-container-low);
+}
+
+html.dark .bg-surface-dim {
+    background-color: var(--color-surface-dim);
+}
+
+html.dark .bg-white {
+    background-color: var(--color-surface-container);
+}
+
+html.dark .text-primary,
+html.dark .text-primary-fixed {
+    color: var(--color-primary);
+}
+
+html.dark .bg-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+html.dark .text-on-primary {
+    color: var(--color-on-primary);
+}
+
+html.dark .text-on-surface {
+    color: var(--color-on-surface);
+}
+
+html.dark .text-on-background {
+    color: var(--color-on-background);
+}
+
+html.dark .text-on-surface-variant {
+    color: var(--color-on-surface-variant);
+}
+
+html.dark .text-secondary {
+    color: var(--color-accent);
+}
+
+html.dark .text-headline-md,
+html.dark .text-headline-sm,
+html.dark .text-display-lg,
+html.dark .text-display-lg-mobile {
+    color: var(--color-primary);
+}
+
+html.dark .border-outline,
+html.dark .border-outline-variant {
+    border-color: var(--color-outline-variant);
+}
+
+html.dark .border-primary {
+    border-color: var(--color-primary);
+}
+
+html.dark input,
+html.dark textarea {
+    color: var(--color-on-surface);
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: var(--color-outline);
+}
+
+html.dark .editorial-shadow {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+html.dark .bg-surface\/80 {
+    background-color: rgba(18, 19, 26, 0.9);
+}
+
+html.dark aside.bg-surface-container-low {
+    background-color: var(--color-surface-container-low);
+}
+
+html.dark ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-on);
+}

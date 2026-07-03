@@ -1,0 +1,8 @@
+[data-toggle-favorite].is-favorite .material-symbols-outlined,
+.product-card [data-toggle-favorite] .material-symbols-outlined {
+    transition: font-variation-settings 0.2s ease, color 0.2s ease;
+}
+
+[data-toggle-favorite] {
+    transition: transform 0.15s ease, color 0.2s ease;
+}

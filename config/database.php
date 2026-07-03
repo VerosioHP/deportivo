@@ -3,7 +3,7 @@
 $host = "localhost";
 $dbname = "deportivo";
 $user = "root";
-$password = "";
+$password = "admin";
 
 try {
 
@@ -24,6 +24,15 @@ try {
     );
 
 } catch(PDOException $e){
+
+    if (defined('DEPORTIVO_JSON_API') && DEPORTIVO_JSON_API) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+            http_response_code(500);
+        }
+        echo json_encode(['ok' => false, 'error' => 'Error de conexión a la base de datos.']);
+        exit;
+    }
 
     die("Error de conexión: " . $e->getMessage());
 
