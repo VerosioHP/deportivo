@@ -1,8 +1,8 @@
 /**
- * Kinetic Noir — Tailwind design tokens (referencia en navegador).
- * Fuente de verdad para el build: js/theme/deportivo-tokens.cjs
+ * Kinetic Noir — Tailwind design tokens (fuente única para el build local).
+ * Fuente: css/DESIGN.md
  */
-window.DeportivoTokens = {
+module.exports = {
     colors: {
         secondary: '#DFFF00',
         'on-secondary': '#0D0D0E',
@@ -12,6 +12,7 @@ window.DeportivoTokens = {
         'secondary-fixed-dim': '#DFFF00',
         'on-secondary-fixed': '#0D0D0E',
         'on-secondary-fixed-variant': '#5C6200',
+
         background: '#F4F4F6',
         surface: '#FFFFFF',
         'surface-bright': '#FFFFFF',
@@ -23,11 +24,13 @@ window.DeportivoTokens = {
         'surface-container-highest': '#CFCFD6',
         'surface-variant': '#E8E8EC',
         'surface-tint': '#919094',
+
         'on-background': '#12131A',
         'on-surface': '#12131A',
         'on-surface-variant': '#46464A',
         outline: '#919094',
         'outline-variant': '#C7C6CA',
+
         primary: '#12131A',
         'on-primary': '#F4F4F6',
         'primary-container': '#E8E8EC',
@@ -37,6 +40,7 @@ window.DeportivoTokens = {
         'on-primary-fixed': '#12131A',
         'on-primary-fixed-variant': '#46464A',
         'inverse-primary': '#C8C6C7',
+
         tertiary: '#33343C',
         'on-tertiary': '#E2E1EB',
         'tertiary-container': '#1E1F26',
@@ -45,13 +49,16 @@ window.DeportivoTokens = {
         'tertiary-fixed-dim': '#C8C6C9',
         'on-tertiary-fixed': '#12131A',
         'on-tertiary-fixed-variant': '#47464A',
+
         'inverse-surface': '#12131A',
         'inverse-on-surface': '#E2E1EB',
+
         error: '#BA1A1A',
         'on-error': '#FFFFFF',
         'error-container': '#FFDAD6',
         'on-error-container': '#93000A',
     },
+
     borderRadius: {
         DEFAULT: '0',
         sm: '0',
@@ -62,6 +69,7 @@ window.DeportivoTokens = {
         '3xl': '0',
         full: '9999px',
     },
+
     spacing: {
         unit: '4px',
         'gutter-mobile': '16px',
@@ -70,6 +78,7 @@ window.DeportivoTokens = {
         'margin-desktop': '64px',
         'container-max-width': '1440px',
     },
+
     fontFamily: {
         'display-lg': ['Anybody', 'sans-serif'],
         'display-lg-mobile': ['Anybody', 'sans-serif'],
@@ -80,6 +89,7 @@ window.DeportivoTokens = {
         'label-md': ['JetBrains Mono', 'monospace'],
         'label-sm': ['JetBrains Mono', 'monospace'],
     },
+
     fontSize: {
         'display-lg': ['80px', { lineHeight: '88px', fontWeight: '800', letterSpacing: '-0.04em' }],
         'display-lg-mobile': ['36px', { lineHeight: '40px', fontWeight: '700', letterSpacing: '-0.02em' }],

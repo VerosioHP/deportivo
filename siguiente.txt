@@ -1,5 +1,0 @@
--Cambiar logo login si la persona ya inicio sesion.
--Crear DB de productos
--Ajustar vista productos para que muestre todo producto que seleccione.
--Crear DB de carrito de compras
--Ajustar el carrito de compras para que mantenga los pedidos, y los envie con los datos del cliente.
