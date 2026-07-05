@@ -1,0 +1,11 @@
+{
+    "name": "deportivo/tienda",
+    "description": "Tienda deportiva DEPORTIVO",
+    "require": {
+        "php": ">=8.0",
+        "dompdf/dompdf": "^3.1"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

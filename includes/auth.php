@@ -48,8 +48,13 @@ $viewsPath = $cliente_views;
 $usuarioLogueado = isset($_SESSION['usuario_id']);
 $esAdmin = $usuarioLogueado && ($_SESSION['rol'] ?? '') === 'admin';
 $usuarioNombre = trim($_SESSION['nombre'] ?? '');
+$usuarioApellido = trim($_SESSION['apellido'] ?? '');
 $usuarioEmail = $_SESSION['email'] ?? '';
 $usuarioRol = $_SESSION['rol'] ?? '';
+$usuarioDisplayNombre = trim($usuarioNombre . ' ' . $usuarioApellido);
+if ($usuarioDisplayNombre === '') {
+    $usuarioDisplayNombre = $usuarioNombre !== '' ? $usuarioNombre : $usuarioEmail;
+}
 
 if (!defined('MAJESTIC_AUTH_LOADED')) {
     define('MAJESTIC_AUTH_LOADED', true);

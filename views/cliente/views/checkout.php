@@ -101,8 +101,8 @@ $cartUrl = 'carrito_compras.php';
                                 <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="provincia" name="provincia" type="text" required placeholder="Madrid" />
                             </div>
                             <div>
-                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="codigo_postal">Código postal *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="codigo_postal" name="codigo_postal" type="text" required placeholder="28001" />
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="codigo_postal">Código postal (opcional)</label>
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="codigo_postal" name="codigo_postal" type="text" placeholder="28001" />
                             </div>
                         </div>
                         <div>

@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$campos = [
+$camposObligatorios = [
     'nombre',
     'apellido',
     'email',
@@ -19,18 +19,17 @@ $campos = [
     'direccion',
     'ciudad',
     'provincia',
-    'codigo_postal',
 ];
 
 $envio = [];
 
-foreach ($campos as $campo) {
+foreach (array_merge($camposObligatorios, ['codigo_postal']) as $campo) {
     $envio[$campo] = trim($_POST[$campo] ?? '');
 }
 
 $envio['notas'] = trim($_POST['notas'] ?? '');
 
-foreach ($campos as $campo) {
+foreach ($camposObligatorios as $campo) {
     if ($envio[$campo] === '') {
         header('Location: ../views/checkout.php?error=campos');
         exit;

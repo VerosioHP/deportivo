@@ -16,6 +16,7 @@ if (!$pedido) {
 $navInViews = true;
 $cartBasePath = $assetBase;
 $cartUrl = 'carrito_compras.php';
+$facturaUrl = '../controllers/facturaController.php?id=' . (int) $pedido['id'];
 
 ?>
 <!DOCTYPE html>
@@ -49,6 +50,15 @@ $cartUrl = 'carrito_compras.php';
 
             <p class="font-headline-sm text-headline-sm text-primary mb-2">Total: <?= deportivo_formatear_precio((float) $pedido['total']) ?></p>
             <p class="font-body-md text-on-surface-variant mb-8">Te contactaremos pronto para confirmar disponibilidad y coordinar el envío.</p>
+
+            <div class="bg-surface-container-low dark:bg-tertiary-container border border-outline-variant p-6 mb-10 text-left">
+                <p class="font-label-sm uppercase tracking-widest text-on-surface-variant mb-2">Tu factura</p>
+                <p class="font-body-md text-on-surface-variant mb-4">Descarga el comprobante de tu pedido en PDF con el detalle de productos y totales.</p>
+                <a href="<?= htmlspecialchars($facturaUrl) ?>" class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-4 font-label-md uppercase tracking-widest no-underline hover:opacity-90 transition-all">
+                    <span class="material-symbols-outlined text-base">download</span>
+                    Descargar factura
+                </a>
+            </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
                 <a href="catalogo.php?categoria=camisetas" class="inline-block bg-secondary text-on-secondary px-10 py-4 font-label-md uppercase tracking-widest no-underline hover:bg-primary hover:text-on-primary transition-all">Seguir comprando</a>

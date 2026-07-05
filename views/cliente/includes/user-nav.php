@@ -18,8 +18,8 @@ $logoutUrl = $clienteControllersPath . 'logout.php';
     <?php if ($esAdmin): ?>
     <span class="hidden sm:inline font-label-sm text-label-sm uppercase tracking-widest text-secondary dark:text-secondary-fixed-dim">Admin</span>
     <?php endif; ?>
-    <span class="hidden lg:inline font-label-sm text-label-sm text-on-surface-variant max-w-[120px] truncate" title="<?= htmlspecialchars($usuarioNombre ?: $usuarioEmail) ?>">
-        <?= htmlspecialchars($usuarioNombre ?: $usuarioEmail) ?>
+    <span class="hidden sm:inline font-label-sm text-label-sm text-on-surface-variant max-w-[160px] truncate" title="<?= htmlspecialchars($usuarioDisplayNombre) ?>">
+        <?= htmlspecialchars($usuarioDisplayNombre) ?>
     </span>
     <a class="font-label-sm text-label-sm uppercase tracking-widest hover:text-secondary transition-colors no-underline text-current" href="<?= htmlspecialchars($logoutUrl) ?>" title="Cerrar sesión">
         <span class="material-symbols-outlined text-xl">logout</span>

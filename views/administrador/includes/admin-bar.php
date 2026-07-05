@@ -24,6 +24,10 @@ if (!defined('MAJESTIC_AUTH_LOADED')) {
                 <span class="material-symbols-outlined text-base">receipt_long</span>
                 Pedidos
             </a>
+            <a href="<?= htmlspecialchars(deportivo_admin_url('usuarios.php')) ?>" class="inline-flex items-center gap-2 px-4 py-2 border border-on-primary/30 text-on-primary font-label-sm uppercase tracking-widest hover:bg-on-primary/10 transition-colors no-underline">
+                <span class="material-symbols-outlined text-base">group</span>
+                Usuarios
+            </a>
             <button type="button" id="admin-new-product" class="px-4 py-2 bg-secondary text-on-secondary font-label-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
                 Nuevo producto
             </button>

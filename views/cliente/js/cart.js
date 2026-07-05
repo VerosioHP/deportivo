@@ -188,7 +188,7 @@
             const row = document.createElement('div');
             row.className = 'flex gap-4 py-4 border-b border-outline-variant last:border-b-0';
             row.innerHTML = `
-                <div class="w-20 aspect-[3/4] bg-surface-container-low overflow-hidden flex-shrink-0">
+                <div class="w-14 aspect-[3/4] bg-surface-container-low overflow-hidden flex-shrink-0">
                     <img class="w-full h-full object-cover" src="${escapeAttr(item.imagen)}" alt="${escapeAttr(item.nombre)}" />
                 </div>
                 <div class="flex-1 min-w-0">
@@ -235,7 +235,7 @@
             row.className = 'flex flex-col md:flex-row gap-8 pb-12 border-b border-outline-variant';
             row.dataset.cartKey = item.key;
             row.innerHTML = `
-                <div class="w-full md:w-48 aspect-[3/4] bg-surface-container-low overflow-hidden">
+                <div class="w-24 md:w-28 aspect-[3/4] bg-surface-container-low overflow-hidden flex-shrink-0">
                     <img class="w-full h-full object-cover" src="${escapeAttr(item.imagen)}" alt="${escapeAttr(item.nombre)}" />
                 </div>
                 <div class="flex-1 flex flex-col justify-between">
