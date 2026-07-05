@@ -2,21 +2,13 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/moneda.php';
+require_once __DIR__ . '/Categoria.php';
 
 class Producto
 {
     public static function obtenerCategoriaPorSlug(string $slug): ?array
     {
-        global $conexion;
-
-        $stmt = $conexion->prepare(
-            'SELECT * FROM categorias WHERE slug = :slug LIMIT 1'
-        );
-        $stmt->bindParam(':slug', $slug, PDO::PARAM_STR);
-        $stmt->execute();
-
-        $categoria = $stmt->fetch();
-        return $categoria ?: null;
+        return Categoria::obtenerPorSlug($slug);
     }
 
     public static function listarPorCategoria(?string $categoriaSlug = null): array
@@ -268,9 +260,7 @@ class Producto
 
     public static function listarCategorias(): array
     {
-        global $conexion;
-
-        return $conexion->query('SELECT id, nombre, slug FROM categorias ORDER BY id ASC')->fetchAll();
+        return Categoria::listarParaSelect();
     }
 
     public static function obtenerPorIdAdmin(int $id): ?array

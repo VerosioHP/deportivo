@@ -37,9 +37,11 @@ $navClass = static function (string $page) use ($activePage): string {
             <a class="<?= $navClass('nosotros') ?>" href="<?= htmlspecialchars($nosotrosUrl) ?>">Nosotros</a>
         </div>
         <div class="flex items-center gap-5 text-primary dark:text-primary-fixed">
+            <?php if (empty($esAdmin)) : ?>
             <button type="button" class="transition-opacity active:opacity-70 hidden sm:block"><span class="material-symbols-outlined">search</span></button>
             <?php include __DIR__ . '/favorites-widget.php'; ?>
             <?php $cartPart = 'button'; include __DIR__ . '/cart-widget.php'; ?>
+            <?php endif; ?>
             <?php include __DIR__ . '/user-nav.php'; ?>
             <button type="button" data-theme-toggle class="theme-toggle transition-opacity active:opacity-70 text-primary dark:text-primary-fixed" aria-label="Activar modo oscuro" aria-pressed="false">
                 <span class="material-symbols-outlined theme-toggle-icon">dark_mode</span>

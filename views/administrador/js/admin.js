@@ -171,13 +171,9 @@
         hideMessages();
 
         try {
-            let categorias = categoriasCache;
-
-            if (!categorias.length) {
-                const data = await fetchJson(`${apiUrl}?action=categorias`);
-                categorias = data.categorias || [];
-                categoriasCache = categorias;
-            }
+            const data = await fetchJson(`${apiUrl}?action=categorias`);
+            const categorias = data.categorias || [];
+            categoriasCache = categorias;
 
             populateForm({ categoria_id: config.defaultCategoriaId || categorias[0]?.id }, categorias);
             openModal();

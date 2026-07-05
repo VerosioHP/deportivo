@@ -54,17 +54,25 @@ function deportivo_init_paths(?string $scriptFile = null): array
 
     $inClientePages = str_contains($suffix, 'views/cliente/views');
     $inClienteHome = $suffix === 'views/cliente';
+    $inAdminViews = str_contains($suffix, 'views/administrador/views');
     $inAdminControllers = str_contains($suffix, 'views/administrador/controllers');
 
-    if ($inClientePages) {
+    if ($inAdminViews) {
+        $clienteHomeUrl = $rootRel . 'views/cliente/index.php';
+        $clientePagesPrefix = $rootRel . 'views/cliente/views/';
+        $adminPagesPrefix = '';
+    } elseif ($inClientePages) {
         $clienteHomeUrl = '../index.php';
         $clientePagesPrefix = '';
+        $adminPagesPrefix = $rootRel . 'views/administrador/views/';
     } elseif ($inClienteHome) {
         $clienteHomeUrl = 'index.php';
         $clientePagesPrefix = 'views/';
+        $adminPagesPrefix = $rootRel . 'views/administrador/views/';
     } else {
         $clienteHomeUrl = $rootRel . 'views/cliente/index.php';
         $clientePagesPrefix = $rootRel . 'views/cliente/views/';
+        $adminPagesPrefix = $rootRel . 'views/administrador/views/';
     }
 
     $webBase = deportivo_web_base();
@@ -78,6 +86,10 @@ function deportivo_init_paths(?string $scriptFile = null): array
         'cliente_pages_prefix' => $clientePagesPrefix,
         'cliente_home_url' => $clienteHomeUrl,
         'cliente_views' => $rootRel . 'views/cliente/views/',
+        'admin_views' => $rootRel . 'views/administrador/views/',
+        'admin_pages_prefix' => $adminPagesPrefix,
+        'cliente_includes' => $rootRel . 'views/cliente/includes/',
+        'admin_includes' => $rootRel . 'views/administrador/includes/',
         'admin_controllers' => $rootRel . 'views/administrador/controllers/',
         'admin_controllers_abs' => $adminApiBase,
         'cliente_controllers' => $rootRel . 'views/cliente/controllers/',
@@ -87,6 +99,7 @@ function deportivo_init_paths(?string $scriptFile = null): array
         'uploads_base' => $rootRel,
         'in_cliente_views' => $inClientePages,
         'in_cliente_home' => $inClienteHome,
+        'in_admin_views' => $inAdminViews,
         'in_admin_controllers' => $inAdminControllers,
         'fs_root' => $root,
         'fs_cliente' => $root . '/views/cliente',
@@ -100,6 +113,13 @@ function deportivo_cliente_url(string $page): string
     global $cliente_pages_prefix;
 
     return ($cliente_pages_prefix ?? '') . ltrim($page, '/');
+}
+
+function deportivo_admin_url(string $page): string
+{
+    global $admin_pages_prefix;
+
+    return ($admin_pages_prefix ?? '') . ltrim($page, '/');
 }
 
 /**

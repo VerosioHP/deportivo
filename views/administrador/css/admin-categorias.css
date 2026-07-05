@@ -1,0 +1,47 @@
+.admin-categorias-table {
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.admin-categorias-table th,
+.admin-categorias-table td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-outline-variant, #e0e0e0);
+    vertical-align: top;
+}
+
+.admin-categorias-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-on-surface-variant, #666);
+    background: var(--color-surface-container-low, #f7f7f7);
+}
+
+.admin-categorias-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.admin-categorias-table tbody tr:hover {
+    background: var(--color-surface-container, #f0f0f0);
+}
+
+.admin-categorias-table .categoria-desc {
+    max-width: 20rem;
+    color: var(--color-on-surface-variant, #666);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.admin-categorias-table .categoria-slug {
+    font-family: ui-monospace, monospace;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant, #666);
+}
+
+#categoria-modal.flex {
+    display: flex;
+}

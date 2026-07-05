@@ -25,6 +25,10 @@ $clienteBase = $cliente_base;
 $clientePagesPrefix = $cliente_pages_prefix;
 $clienteHomeUrl = $cliente_home_url;
 $clienteViewsPath = $cliente_views;
+$adminViewsPath = $admin_views;
+$adminPagesPrefix = $admin_pages_prefix;
+$clienteIncludesPath = $cliente_includes;
+$adminIncludesPath = $admin_includes;
 $adminControllersPath = $admin_controllers_abs ?? $admin_controllers;
 $clienteControllersPath = $cliente_controllers;
 $adminJsPath = $admin_js;
@@ -32,8 +36,11 @@ $adminCssPath = $admin_css;
 $clienteJsPath = $cliente_js;
 $uploadsBasePath = $uploads_base;
 
-$authInViews = $in_cliente_views;
-$navInViews = $in_cliente_views;
+$GLOBALS['cliente_pages_prefix'] = $cliente_pages_prefix;
+$GLOBALS['admin_pages_prefix'] = $admin_pages_prefix;
+
+$authInViews = $in_cliente_views || $in_admin_views;
+$navInViews = $in_cliente_views || $in_admin_views;
 $siteRoot = $root_rel ?: '.';
 $controllersPath = $admin_controllers;
 $viewsPath = $cliente_views;

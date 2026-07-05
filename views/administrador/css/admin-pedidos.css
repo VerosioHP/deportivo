@@ -1,0 +1,138 @@
+.admin-pedidos-table {
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.admin-pedidos-table th,
+.admin-pedidos-table td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-outline-variant, #e0e0e0);
+}
+
+.admin-pedidos-table th {
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-on-surface-variant, #666);
+    background: var(--color-surface-container-low, #f7f7f7);
+}
+
+.admin-pedidos-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.admin-pedidos-table tbody tr:hover {
+    background: var(--color-surface-container, #f0f0f0);
+}
+
+.pedido-estado {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.pedido-estado--pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.pedido-estado--confirmado {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.pedido-estado--enviado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.pedido-estado--cancelado {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.pedido-detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .pedido-detalle-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pedido-detalle-seccion h3 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-on-surface-variant, #666);
+    margin-bottom: 0.5rem;
+}
+
+.pedido-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.pedido-items-table th,
+.pedido-items-table td {
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--color-outline-variant, #e0e0e0);
+    text-align: left;
+}
+
+.pedido-items-table th {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-on-surface-variant, #666);
+}
+
+.pedido-items-table td:last-child,
+.pedido-items-table th:last-child,
+.pedido-items-table td:nth-child(5),
+.pedido-items-table th:nth-child(5),
+.pedido-items-table td:nth-child(6),
+.pedido-items-table th:nth-child(6) {
+    text-align: right;
+}
+
+.pedido-item-celda-img {
+    width: 4.5rem;
+    padding-right: 0.5rem !important;
+}
+
+.pedido-item-img {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: cover;
+    border: 1px solid var(--color-outline-variant, #e0e0e0);
+    background: var(--color-surface-container, #f0f0f0);
+}
+
+.pedido-item-sin-img {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.5rem;
+    color: var(--color-on-surface-variant, #999);
+    background: var(--color-surface-container, #f0f0f0);
+    border: 1px solid var(--color-outline-variant, #e0e0e0);
+}
+
+#pedido-detalle-modal.flex {
+    display: flex;
+}

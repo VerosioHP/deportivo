@@ -3,7 +3,7 @@
 session_start();
 
 require_once dirname(__DIR__, 3) . '/models/Pedido.php';
-require_once dirname(__DIR__, 3) . '/includes/WhatsAppPedido.php';
+require_once dirname(__DIR__, 3) . '/includes/MailPedido.php';
 require_once dirname(__DIR__, 3) . '/config/moneda.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -52,15 +52,6 @@ if (!is_array($items) || empty($items)) {
 
 $usuarioId = isset($_SESSION['usuario_id']) ? (int) $_SESSION['usuario_id'] : null;
 
-$subtotal = 0.0;
-
-foreach ($items as $item) {
-    $subtotal += (float) ($item['precio'] ?? 0) * (int) ($item['cantidad'] ?? 1);
-}
-
-$envioCosto = deportivo_calcular_envio($subtotal);
-$total = $subtotal + $envioCosto;
-
 try {
     $pedidoId = Pedido::crear($envio, $items, $usuarioId);
 } catch (Throwable $e) {
@@ -68,16 +59,12 @@ try {
     exit;
 }
 
-$mensajeWhatsApp = WhatsAppPedido::construirMensaje(
-    $pedidoId,
-    $envio,
-    $items,
-    $subtotal,
-    $envioCosto,
-    $total
-);
+try {
+    MailPedido::notificarPedidoNuevo($pedidoId);
+} catch (Throwable $e) {
+    // El pedido ya está guardado; no bloquear si falla el correo.
+}
 
-$_SESSION['whatsapp_pedido_url'] = WhatsAppPedido::construirUrl($mensajeWhatsApp);
 $_SESSION['ultimo_pedido_id'] = $pedidoId;
 
 header('Location: ../views/checkout_exito.php?id=' . $pedidoId);

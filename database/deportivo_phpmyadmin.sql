@@ -156,7 +156,7 @@ CREATE TABLE `pedidos` (
   `subtotal` decimal(10,2) NOT NULL,
   `envio` decimal(10,2) NOT NULL DEFAULT '0.00',
   `total` decimal(10,2) NOT NULL,
-  `estado` enum('pendiente','confirmado','enviado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pendiente',
+  `estado` enum('pendiente','confirmado','enviado','cancelado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pendiente',
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

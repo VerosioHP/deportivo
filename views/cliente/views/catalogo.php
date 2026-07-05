@@ -4,27 +4,20 @@ $authInViews = true;
 require_once dirname(__DIR__, 3) . '/includes/auth.php';
 require_once dirname(__DIR__, 3) . '/models/Producto.php';
 
-$categoriaSlug = $_GET['categoria'] ?? 'camisetas';
-$categoria = Producto::obtenerCategoriaPorSlug($categoriaSlug);
+$categorias = Producto::listarCategorias();
+$categoriaSlug = $_GET['categoria'] ?? ($categorias[0]['slug'] ?? '');
+$categoria = $categoriaSlug !== '' ? Producto::obtenerCategoriaPorSlug($categoriaSlug) : null;
 
-if (!$categoria) {
-    $categoriaSlug = 'camisetas';
+if (!$categoria && !empty($categorias)) {
+    $categoriaSlug = $categorias[0]['slug'];
     $categoria = Producto::obtenerCategoriaPorSlug($categoriaSlug);
 }
 
-$productos = Producto::listarPorCategoria($categoriaSlug);
-$categorias = Producto::listarCategorias();
+$productos = $categoria ? Producto::listarPorCategoria($categoriaSlug) : [];
 $filtros = Producto::extraerFiltros($productos);
-$esPantalonetas = $categoriaSlug === 'pantalonetas';
+$esPantalonetas = in_array($categoriaSlug, ['pantalonetas', 'pantalonetas-pro'], true);
 
-$titulosCategoria = [
-    'camisetas' => 'Camisetas',
-    'pantalonetas' => 'Pantalonetas',
-    'jeans' => 'Pantalonetas',
-    'chaquetas' => 'Pantalonetas',
-];
-
-$tituloPagina = $titulosCategoria[$categoriaSlug] ?? 'Catálogo';
+$tituloPagina = $categoria['nombre'] ?? 'Catálogo';
 
 $bannerKey = match (true) {
     $categoriaSlug === 'camisetas' => 'catalogo_camisetas',
@@ -36,7 +29,7 @@ require_once __DIR__ . '/../includes/sport-images.php';
 
 $navInViews = true;
 $activePage = 'catalogo';
-$categoriaSlug = $categoria['slug'];
+$categoriaSlug = $categoria['slug'] ?? '';
 $cartBasePath = $assetBase;
 $cartUrl = 'carrito_compras.php';
 
@@ -54,7 +47,7 @@ $cartUrl = 'carrito_compras.php';
 
 <body class="bg-background dark:bg-on-background text-on-surface dark:text-inverse-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container transition-colors duration-300<?= deportivo_admin_body_class() ?>">
     <?php include __DIR__ . '/../includes/site-nav.php'; ?>
-    <?php $defaultCategoriaId = (int) $categoria['id']; include dirname(__DIR__, 2) . '/administrador/includes/admin-panel.php'; ?>
+    <?php $defaultCategoriaId = (int) ($categoria['id'] ?? 0); include dirname(__DIR__, 2) . '/administrador/includes/admin-panel.php'; ?>
 
     <section class="page-hero">
         <img src="<?= deportivo_img_ctx($bannerKey, 'xl') ?>" alt="<?= htmlspecialchars($tituloPagina) ?> deportivas"<?= deportivo_admin_site_img($bannerKey) ?> />
@@ -62,7 +55,7 @@ $cartUrl = 'carrito_compras.php';
         <div class="page-hero-content text-white max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop">
             <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-3">Catálogo</span>
             <h1 class="font-display-lg text-display-lg md:text-display-lg uppercase leading-none mb-4"><?= htmlspecialchars($tituloPagina) ?></h1>
-            <p class="font-body-lg text-body-lg text-white/80 max-w-xl"><?= htmlspecialchars($categoria['descripcion']) ?></p>
+            <p class="font-body-lg text-body-lg text-white/80 max-w-xl"><?= htmlspecialchars($categoria['descripcion'] ?? '') ?></p>
         </div>
     </section>
 

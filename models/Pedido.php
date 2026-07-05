@@ -2,9 +2,11 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/moneda.php';
+require_once __DIR__ . '/Producto.php';
 
 class Pedido
 {
+    public const ESTADOS = ['pendiente', 'confirmado', 'enviado', 'cancelado'];
     public static function crear(array $envio, array $items, ?int $usuarioId = null): int
     {
         global $conexion;
@@ -94,5 +96,106 @@ class Pedido
         $pedido['items'] = $itemsStmt->fetchAll();
 
         return $pedido;
+    }
+
+    public static function listar(?string $estado = null, int $limit = 50, int $offset = 0): array
+    {
+        global $conexion;
+
+        $sql = 'SELECT * FROM pedidos';
+        $params = [];
+
+        if ($estado !== null && $estado !== '') {
+            $sql .= ' WHERE estado = :estado';
+            $params[':estado'] = $estado;
+        }
+
+        $sql .= ' ORDER BY fecha_creacion DESC LIMIT :limit OFFSET :offset';
+
+        $stmt = $conexion->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public static function contar(?string $estado = null): int
+    {
+        global $conexion;
+
+        $sql = 'SELECT COUNT(*) FROM pedidos';
+        $params = [];
+
+        if ($estado !== null && $estado !== '') {
+            $sql .= ' WHERE estado = :estado';
+            $params[':estado'] = $estado;
+        }
+
+        $stmt = $conexion->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function contarPendientes(): int
+    {
+        return self::contar('pendiente');
+    }
+
+    public static function actualizarEstado(int $id, string $estado): bool
+    {
+        global $conexion;
+
+        $estadosValidos = self::ESTADOS;
+
+        if (!in_array($estado, $estadosValidos, true)) {
+            return false;
+        }
+
+        $stmt = $conexion->prepare('UPDATE pedidos SET estado = :estado WHERE id = :id');
+        $stmt->bindValue(':estado', $estado);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute() && $stmt->rowCount() > 0;
+    }
+
+    public static function enriquecerItemsConImagen(array $items): array
+    {
+        foreach ($items as &$item) {
+            if (!empty($item['imagen'])) {
+                $item['imagen'] = Producto::urlImagen((string) $item['imagen']);
+                continue;
+            }
+
+            $productoId = (int) ($item['producto_id'] ?? 0);
+
+            if ($productoId <= 0) {
+                $item['imagen'] = '';
+                continue;
+            }
+
+            $producto = Producto::obtenerPorIdAdmin($productoId);
+
+            if ($producto && !empty($producto['imagen_principal'])) {
+                $item['imagen'] = Producto::urlImagen($producto['imagen_principal']);
+            } else {
+                $item['imagen'] = '';
+            }
+        }
+
+        unset($item);
+
+        return $items;
     }
 }
