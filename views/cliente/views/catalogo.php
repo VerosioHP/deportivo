@@ -5,19 +5,32 @@ require_once dirname(__DIR__, 3) . '/includes/auth.php';
 require_once dirname(__DIR__, 3) . '/models/Producto.php';
 
 $categorias = Producto::listarCategorias();
-$categoriaSlug = $_GET['categoria'] ?? ($categorias[0]['slug'] ?? '');
-$categoria = $categoriaSlug !== '' ? Producto::obtenerCategoriaPorSlug($categoriaSlug) : null;
+$categoriaSlugRequest = isset($_GET['categoria']) ? trim((string) $_GET['categoria']) : '';
+$categoria = null;
+$categoriaSlug = '';
 
-if (!$categoria && !empty($categorias)) {
-    $categoriaSlug = $categorias[0]['slug'];
-    $categoria = Producto::obtenerCategoriaPorSlug($categoriaSlug);
+if ($categoriaSlugRequest !== '') {
+    $categoria = Producto::obtenerCategoriaPorSlug($categoriaSlugRequest);
 }
 
-$productos = $categoria ? Producto::listarPorCategoria($categoriaSlug) : [];
+if ($categoria) {
+    $categoriaSlug = (string) $categoria['slug'];
+} elseif (!empty($categorias)) {
+    $categoria = Producto::obtenerCategoriaPorSlug((string) $categorias[0]['slug']);
+    if ($categoria) {
+        $categoriaSlug = (string) $categoria['slug'];
+    }
+}
+
+$productos = $categoriaSlug !== ''
+    ? Producto::listarPorCategoria($categoriaSlug)
+    : Producto::listarPorCategoria(null);
+
 $filtros = Producto::extraerFiltros($productos);
 $esPantalonetas = in_array($categoriaSlug, ['pantalonetas', 'pantalonetas-pro'], true);
 
 $tituloPagina = $categoria['nombre'] ?? 'Catálogo';
+$categoriaNombreUi = $categoria['nombre'] ?? ($productos ? 'Todos los productos' : 'Catálogo');
 
 $bannerKey = match (true) {
     $categoriaSlug === 'camisetas' => 'catalogo_camisetas',
@@ -29,7 +42,6 @@ require_once __DIR__ . '/../includes/sport-images.php';
 
 $navInViews = true;
 $activePage = 'catalogo';
-$categoriaSlug = $categoria['slug'] ?? '';
 $cartBasePath = $assetBase;
 $cartUrl = 'carrito_compras.php';
 
@@ -111,6 +123,7 @@ $cartUrl = 'carrito_compras.php';
             </aside>
             <!-- Product Grid -->
             <section class="col-span-12 md:col-span-9">
+                <?php if (!empty($categorias)): ?>
                 <div class="catalog-category-bar flex justify-end mb-8 md:mb-10">
                     <div class="catalog-category-dropdown" data-category-dropdown>
                         <span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest sr-only">Categoría</span>
@@ -120,7 +133,7 @@ $cartUrl = 'carrito_compras.php';
                                 aria-haspopup="listbox"
                                 aria-expanded="false"
                                 aria-controls="catalog-category-menu">
-                            <span><?= htmlspecialchars($categoria['nombre']) ?></span>
+                            <span><?= htmlspecialchars($categoriaNombreUi) ?></span>
                             <span class="material-symbols-outlined catalog-category-chevron" aria-hidden="true">expand_more</span>
                         </button>
                         <ul class="catalog-category-menu"
@@ -144,9 +157,16 @@ $cartUrl = 'carrito_compras.php';
                         </ul>
                     </div>
                 </div>
+                <?php endif; ?>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-gutter-desktop" id="catalog-grid">
                     <?php if (empty($productos)): ?>
-                    <p class="col-span-full font-body-md text-body-md text-on-surface-variant">No hay productos disponibles en esta categoría.</p>
+                    <p class="col-span-full font-body-md text-body-md text-on-surface-variant">
+                        <?php if (empty($categorias)): ?>
+                            No hay categorías ni productos en la tienda todavía. Si eres administrador, crea categorías y productos desde el panel.
+                        <?php else: ?>
+                            No hay productos disponibles en esta categoría.
+                        <?php endif; ?>
+                    </p>
                     <?php else: ?>
                     <?php foreach ($productos as $producto): ?>
                     <?php include __DIR__ . '/../includes/producto-card.php'; ?>
