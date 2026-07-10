@@ -6,6 +6,7 @@ module.exports = {
     content: [
         './index.php',
         './views/**/*.php',
+        './views/**/*.js',
         './js/**/*.js',
         './css/**/*.css',
     ],

@@ -127,7 +127,7 @@
 
     function getShipping(subtotal) {
         const moneda = window.DEPORTIVO_MONEDA || {};
-        const minGratis = moneda.envioGratisMin ?? 350000;
+        const minGratis = moneda.envioGratisMin ?? 250000;
         const costo = moneda.envioCosto ?? 15000;
 
         return subtotal >= minGratis ? 0 : subtotal > 0 ? costo : 0;
@@ -223,17 +223,17 @@
 
         items.forEach((item) => {
             const row = document.createElement('div');
-            row.className = 'flex gap-4 py-4 border-b border-outline-variant last:border-b-0';
+            row.className = 'cart-modal-item';
             row.innerHTML = `
-                <div class="w-14 aspect-[3/4] bg-surface-container-low overflow-hidden flex-shrink-0">
-                    <img class="w-full h-full object-cover" src="${escapeAttr(item.imagen)}" alt="${escapeAttr(item.nombre)}" />
+                <div class="cart-modal-item__thumb">
+                    <img class="cart-modal-item__img" src="${escapeAttr(item.imagen)}" alt="${escapeAttr(item.nombre)}" loading="lazy" />
                 </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between gap-2 mb-1">
-                        <h4 class="font-headline-sm text-headline-sm truncate">${escapeHtml(item.nombre)}</h4>
-                        <p class="font-body-md text-body-md text-secondary flex-shrink-0">${formatPrice(item.precio * item.cantidad)}</p>
+                <div class="cart-modal-item__body">
+                    <div class="cart-modal-item__header">
+                        <h4 class="cart-modal-item__name font-headline-sm text-headline-sm leading-tight">${escapeHtml(item.nombre)}</h4>
+                        <p class="font-body-md text-body-md text-secondary shrink-0">${formatPrice(item.precio * item.cantidad)}</p>
                     </div>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">${escapeHtml(variantLabel(item))}</p>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">${escapeHtml(variantLabel(item))}</p>
                     <p class="font-label-sm text-label-sm text-on-surface-variant">Cantidad: ${item.cantidad}</p>
                 </div>
             `;

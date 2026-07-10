@@ -32,6 +32,14 @@
     let totalPaginas = 1;
     let pedidoActualId = null;
 
+    function numeroPedido(pedido) {
+        const numero = String(pedido.numero ?? '').trim();
+        if (/^\d{5}$/.test(numero)) {
+            return numero;
+        }
+        return String(pedido.id ?? '').padStart(5, '0');
+    }
+
     function formatearPrecio(valor) {
         const numero = Number(valor) || 0;
         return '$' + numero.toLocaleString('es-CO', { maximumFractionDigits: 0 });
@@ -83,7 +91,7 @@
         const params = new URLSearchParams({
             action: 'list',
             page: String(paginaActual),
-            limit: '20',
+            limit: '10',
         });
 
         if (estado) {
@@ -112,7 +120,7 @@
 
             tbody.innerHTML = pedidos.map((pedido) => `
                 <tr data-pedido-id="${pedido.id}">
-                    <td class="font-mono">#${pedido.id}</td>
+                    <td class="font-mono">#${numeroPedido(pedido)}</td>
                     <td>${formatearFecha(pedido.fecha_creacion)}</td>
                     <td>${escapeHtml(pedido.nombre)} ${escapeHtml(pedido.apellido)}</td>
                     <td>${escapeHtml(pedido.email)}</td>
@@ -129,8 +137,8 @@
             const fin = Math.min(data.page * data.limit, data.total);
             infoEl.textContent = `Mostrando ${inicio}–${fin} de ${data.total} pedidos`;
 
-            btnAnterior.disabled = data.page <= 1;
-            btnSiguiente.disabled = data.page >= totalPaginas;
+            btnAnterior.disabled = paginaActual <= 1;
+            btnSiguiente.disabled = paginaActual >= totalPaginas;
         } catch (err) {
             loadingEl.classList.add('hidden');
             errorEl.textContent = 'Error de conexión al cargar pedidos.';
@@ -175,7 +183,7 @@
             }
 
             const pedido = data.pedido;
-            document.getElementById('pedido-detalle-titulo').textContent = `Pedido #${pedido.id}`;
+            document.getElementById('pedido-detalle-titulo').textContent = `Pedido #${numeroPedido(pedido)}`;
             estadoSelect.value = pedido.estado;
 
             const itemsHtml = (pedido.items || []).map((item) => {
@@ -188,6 +196,7 @@
                     <tr>
                         <td class="pedido-item-celda-img">${imagenHtml}</td>
                         <td>${escapeHtml(item.nombre)}</td>
+                        <td>${escapeHtml(item.color || '—')}</td>
                         <td>${escapeHtml(item.talla || '—')}</td>
                         <td>${item.cantidad}</td>
                         <td>${formatearPrecio(item.precio)}</td>
@@ -224,6 +233,7 @@
                                 <tr>
                                     <th>Imagen</th>
                                     <th>Producto</th>
+                                    <th>Color</th>
                                     <th>Talla</th>
                                     <th>Cant.</th>
                                     <th>Precio</th>

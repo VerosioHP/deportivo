@@ -101,10 +101,10 @@
 
 .pedido-items-table td:last-child,
 .pedido-items-table th:last-child,
-.pedido-items-table td:nth-child(5),
-.pedido-items-table th:nth-child(5),
 .pedido-items-table td:nth-child(6),
-.pedido-items-table th:nth-child(6) {
+.pedido-items-table th:nth-child(6),
+.pedido-items-table td:nth-child(7),
+.pedido-items-table th:nth-child(7) {
     text-align: right;
 }
 

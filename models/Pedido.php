@@ -7,6 +7,36 @@ require_once __DIR__ . '/Producto.php';
 class Pedido
 {
     public const ESTADOS = ['pendiente', 'confirmado', 'enviado', 'cancelado'];
+
+    public static function numeroPublico(array $pedido): string
+    {
+        $numero = trim((string) ($pedido['numero'] ?? ''));
+
+        if ($numero !== '' && preg_match('/^\d{5}$/', $numero)) {
+            return $numero;
+        }
+
+        return str_pad((string) (int) ($pedido['id'] ?? 0), 5, '0', STR_PAD_LEFT);
+    }
+
+    public static function generarNumeroUnico(): string
+    {
+        global $conexion;
+
+        for ($intento = 0; $intento < 50; $intento++) {
+            $numero = str_pad((string) random_int(0, 99999), 5, '0', STR_PAD_LEFT);
+
+            $stmt = $conexion->prepare('SELECT COUNT(*) FROM pedidos WHERE numero = :numero');
+            $stmt->execute([':numero' => $numero]);
+
+            if ((int) $stmt->fetchColumn() === 0) {
+                return $numero;
+            }
+        }
+
+        throw new RuntimeException('No se pudo generar un número de pedido único.');
+    }
+
     public static function crear(array $envio, array $items, ?int $usuarioId = null): int
     {
         global $conexion;
@@ -19,18 +49,20 @@ class Pedido
 
         $envioCosto = deportivo_calcular_envio($subtotal);
         $total = $subtotal + $envioCosto;
+        $numeroPedido = self::generarNumeroUnico();
 
         $conexion->beginTransaction();
 
         try {
             $stmt = $conexion->prepare(
                 'INSERT INTO pedidos
-                (usuario_id, nombre, apellido, email, telefono, direccion, ciudad, provincia, codigo_postal, notas, subtotal, envio, total)
+                (numero, usuario_id, nombre, apellido, email, telefono, direccion, ciudad, provincia, codigo_postal, notas, subtotal, envio, total)
                 VALUES
-                (:usuario_id, :nombre, :apellido, :email, :telefono, :direccion, :ciudad, :provincia, :codigo_postal, :notas, :subtotal, :envio, :total)'
+                (:numero, :usuario_id, :nombre, :apellido, :email, :telefono, :direccion, :ciudad, :provincia, :codigo_postal, :notas, :subtotal, :envio, :total)'
             );
 
             $stmt->execute([
+                ':numero' => $numeroPedido,
                 ':usuario_id' => $usuarioId,
                 ':nombre' => $envio['nombre'],
                 ':apellido' => $envio['apellido'],
@@ -125,7 +157,10 @@ class Pedido
             $params[':estado'] = $estado;
         }
 
-        $sql .= ' ORDER BY fecha_creacion DESC LIMIT :limit OFFSET :offset';
+        $limit = max(1, $limit);
+        $offset = max(0, $offset);
+
+        $sql .= ' ORDER BY fecha_creacion DESC LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset;
 
         $stmt = $conexion->prepare($sql);
 
@@ -133,8 +168,6 @@ class Pedido
             $stmt->bindValue($key, $value);
         }
 
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();

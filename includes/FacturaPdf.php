@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../config/moneda.php';
 require_once __DIR__ . '/../models/Producto.php';
+require_once __DIR__ . '/../models/Pedido.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -57,7 +58,7 @@ class FacturaPdf
 
     private static function construirHtml(array $pedido): string
     {
-        $pedidoId = (int) $pedido['id'];
+        $numeroPedido = htmlspecialchars(Pedido::numeroPublico($pedido));
         $fecha = self::formatearFecha($pedido['fecha_creacion'] ?? '');
         $cliente = htmlspecialchars($pedido['nombre'] . ' ' . $pedido['apellido']);
         $email = htmlspecialchars($pedido['email'] ?? '');
@@ -221,7 +222,7 @@ class FacturaPdf
 <body>
     <div class="header">
         <div class="brand">DEPORTIVO<span>.</span></div>
-        <div class="meta">Factura de pedido #{$pedidoId} · {$fecha} · Estado: {$estado}</div>
+        <div class="meta">Factura de pedido #{$numeroPedido} · {$fecha} · Estado: {$estado}</div>
     </div>
 
     <table class="grid">

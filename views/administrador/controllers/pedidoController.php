@@ -17,7 +17,7 @@ try {
         case 'list':
             $estado = trim($_GET['estado'] ?? '');
             $page = max(1, (int) ($_GET['page'] ?? 1));
-            $limit = min(100, max(10, (int) ($_GET['limit'] ?? 20)));
+            $limit = min(100, max(1, (int) ($_GET['limit'] ?? 10)));
             $offset = ($page - 1) * $limit;
 
             $pedidos = Pedido::listar($estado !== '' ? $estado : null, $limit, $offset);
@@ -29,7 +29,7 @@ try {
                 'total' => $total,
                 'page' => $page,
                 'limit' => $limit,
-                'totalPages' => (int) ceil($total / $limit),
+                'totalPages' => $total > 0 ? (int) ceil($total / $limit) : 1,
             ]);
             break;
 

@@ -369,3 +369,58 @@ html.dark .card-color-overlay {
 html.dark .card-color-overlay .card-color-swatch.border-secondary {
     box-shadow: 0 0 0 1px var(--color-on-background), 0 0 0 3px var(--color-secondary);
 }
+
+/* Carrito lateral — miniaturas con tamaño fijo */
+.cart-modal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.cart-modal-item:last-child {
+    border-bottom: none;
+}
+
+.cart-modal-item__thumb {
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: var(--color-surface-container-low);
+}
+
+.cart-modal-item__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.cart-modal-item__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.cart-modal-item__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.cart-modal-item__name {
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

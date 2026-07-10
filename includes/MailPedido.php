@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/SmtpMailer.php';
 require_once __DIR__ . '/../config/moneda.php';
+require_once __DIR__ . '/../models/Pedido.php';
 
 class MailPedido
 {
@@ -14,8 +15,8 @@ class MailPedido
             return false;
         }
 
-        $pedidoId = (int) $pedido['id'];
-        $asunto = "Nuevo pedido #{$pedidoId} — DEPORTIVO";
+        $numeroPedido = Pedido::numeroPublico($pedido);
+        $asunto = "Nuevo pedido #{$numeroPedido} — DEPORTIVO";
         $html = self::construirHtmlAdmin($pedido);
         $texto = self::construirTextoAdmin($pedido);
 
@@ -31,8 +32,8 @@ class MailPedido
             return false;
         }
 
-        $pedidoId = (int) $pedido['id'];
-        $asunto = "Tu pedido #{$pedidoId} fue recibido — DEPORTIVO";
+        $numeroPedido = Pedido::numeroPublico($pedido);
+        $asunto = "Tu pedido #{$numeroPedido} fue recibido — DEPORTIVO";
         $html = self::construirHtmlCliente($pedido);
         $texto = self::construirTextoCliente($pedido);
 
@@ -48,8 +49,8 @@ class MailPedido
             return false;
         }
 
-        $pedidoId = (int) $pedido['id'];
-        $asunto = "Tu pedido #{$pedidoId} va en camino — DEPORTIVO";
+        $numeroPedido = Pedido::numeroPublico($pedido);
+        $asunto = "Tu pedido #{$numeroPedido} va en camino — DEPORTIVO";
         $html = self::construirHtmlEnCamino($pedido);
         $texto = self::construirTextoEnCamino($pedido);
 
@@ -88,7 +89,7 @@ HTML;
 
     private static function construirHtmlAdmin(array $pedido): string
     {
-        $pedidoId = (int) $pedido['id'];
+        $numeroPedido = Pedido::numeroPublico($pedido);
         $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
         $notasHtml = !empty($pedido['notas'])
@@ -103,7 +104,7 @@ HTML;
 <html lang="es">
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
-    <h2 style="color: #c9a227;">Nuevo pedido #{$pedidoId}</h2>
+    <h2 style="color: #c9a227;">Nuevo pedido #{$numeroPedido}</h2>
     <p>Se ha registrado un nuevo pedido en la tienda.</p>
 
     <h3>Cliente</h3>
@@ -140,7 +141,7 @@ HTML;
 
     private static function construirHtmlCliente(array $pedido): string
     {
-        $pedidoId = (int) $pedido['id'];
+        $numeroPedido = Pedido::numeroPublico($pedido);
         $nombre = htmlspecialchars($pedido['nombre']);
         $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
@@ -157,7 +158,7 @@ HTML;
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
     <h2 style="color: #c9a227;">¡Gracias por tu pedido, {$nombre}!</h2>
-    <p>Hemos recibido tu pedido <strong>#{$pedidoId}</strong>. Te contactaremos pronto para confirmar disponibilidad y envío.</p>
+    <p>Hemos recibido tu pedido <strong>#{$numeroPedido}</strong>. Te contactaremos pronto para confirmar disponibilidad y envío.</p>
 
     <h3>Dirección de envío</h3>
     <p>
@@ -190,7 +191,7 @@ HTML;
 
     private static function construirHtmlEnCamino(array $pedido): string
     {
-        $pedidoId = (int) $pedido['id'];
+        $numeroPedido = Pedido::numeroPublico($pedido);
         $nombre = htmlspecialchars($pedido['nombre']);
         $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
@@ -202,7 +203,7 @@ HTML;
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
     <h2 style="color: #c9a227;">¡Tu pedido va en camino, {$nombre}!</h2>
-    <p>Tu pedido <strong>#{$pedidoId}</strong> ya fue despachado y está en ruta hacia tu dirección.</p>
+    <p>Tu pedido <strong>#{$numeroPedido}</strong> ya fue despachado y está en ruta hacia tu dirección.</p>
 
     <h3>Dirección de entrega</h3>
     <p>
@@ -234,7 +235,7 @@ HTML;
     private static function construirTextoEnCamino(array $pedido): string
     {
         $lineas = [];
-        $lineas[] = "PEDIDO EN CAMINO #{$pedido['id']}";
+        $lineas[] = 'PEDIDO EN CAMINO #' . Pedido::numeroPublico($pedido);
         $lineas[] = '';
         $lineas[] = "Hola {$pedido['nombre']},";
         $lineas[] = 'Tu pedido ya fue despachado y va en camino hacia:';
@@ -296,7 +297,7 @@ HTML;
     private static function construirTextoPedido(array $pedido, string $titulo): string
     {
         $lineas = [];
-        $lineas[] = "{$titulo} #{$pedido['id']}";
+        $lineas[] = "{$titulo} #" . Pedido::numeroPublico($pedido);
         $lineas[] = '';
         $lineas[] = 'Cliente: ' . $pedido['nombre'] . ' ' . $pedido['apellido'];
         $lineas[] = 'Email: ' . $pedido['email'];

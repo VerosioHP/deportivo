@@ -37,7 +37,7 @@ $facturaUrl = '../controllers/facturaController.php?id=' . (int) $pedido['id'];
         <div class="max-w-xl mx-auto">
             <span class="material-symbols-outlined text-5xl text-secondary mb-6">check_circle</span>
             <h1 class="font-display-lg text-display-lg text-primary dark:text-primary-fixed mb-4 uppercase">¡Pedido confirmado!</h1>
-            <p class="font-body-lg text-on-surface-variant mb-2">Gracias, <?= htmlspecialchars($pedido['nombre']) ?>. Hemos recibido tu pedido <strong>#<?= (int) $pedido['id'] ?></strong>.</p>
+            <p class="font-body-lg text-on-surface-variant mb-2">Gracias, <?= htmlspecialchars($pedido['nombre']) ?>. Hemos recibido tu pedido <strong>#<?= htmlspecialchars(Pedido::numeroPublico($pedido)) ?></strong>.</p>
             <p class="font-body-md text-on-surface-variant mb-10">Te enviamos un correo a <strong><?= htmlspecialchars($pedido['email']) ?></strong> con los detalles. La tienda también fue notificada por email. Tu compra llegará a:</p>
 
             <div class="text-left bg-surface-container-low dark:bg-tertiary-container p-8 mb-10 border border-outline-variant">

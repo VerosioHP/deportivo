@@ -1,12 +1,13 @@
 <?php
 
 require_once __DIR__ . '/../models/Producto.php';
+require_once __DIR__ . '/../models/Pedido.php';
 require_once __DIR__ . '/../config/moneda.php';
 
 class WhatsAppPedido
 {
     public static function construirMensaje(
-        int $pedidoId,
+        string $numeroPedido,
         array $envio,
         array $items,
         float $subtotal,
@@ -17,7 +18,7 @@ class WhatsAppPedido
         $tienda = $config['nombre_tienda'];
         $lineas = [];
 
-        $lineas[] = '🛍️ *NUEVO PEDIDO #' . $pedidoId . '*';
+        $lineas[] = '🛍️ *NUEVO PEDIDO #' . $numeroPedido . '*';
         $lineas[] = '*' . $tienda . '*';
         $lineas[] = '';
         $lineas[] = '👤 *DATOS DEL CLIENTE*';
@@ -89,7 +90,7 @@ class WhatsAppPedido
         $items = self::enriquecerItemsConImagen($pedido['items'] ?? []);
 
         $mensaje = self::construirMensaje(
-            (int) $pedido['id'],
+            Pedido::numeroPublico($pedido),
             [
                 'nombre' => $pedido['nombre'],
                 'apellido' => $pedido['apellido'],
