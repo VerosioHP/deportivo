@@ -63,16 +63,16 @@ $adminApiUrl = $adminControllersPath . 'productoController.php';
                     </div>
                 </div>
                 <div>
-                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="admin-stock">Estado de stock</label>
-                    <select class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:ring-0 font-body-md" id="admin-stock" name="stock_estado">
-                        <option value="disponible">Disponible</option>
-                        <option value="pocas_unidades">Pocas unidades</option>
-                        <option value="agotado">Agotado</option>
-                    </select>
-                </div>
-                <div>
                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="admin-tallas">Tallas (separadas por coma) *</label>
-                    <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:ring-0 font-body-md" id="admin-tallas" name="tallas" type="text" placeholder="34, 36, 38" required />
+                    <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:ring-0 font-body-md" id="admin-tallas" name="tallas" type="text" placeholder="S, M, L, XL" required />
+                </div>
+                <div class="md:col-span-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block font-label-md text-label-md text-on-surface-variant">Colores y stock *</label>
+                        <button type="button" id="admin-add-color" class="font-label-sm text-label-sm uppercase tracking-widest text-secondary hover:underline">+ Añadir color</button>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-4">Usa una sola imagen con todas las variantes. Aquí defines el nombre del color y cuántas unidades hay de cada uno.</p>
+                    <div id="admin-colores-list" class="space-y-3"></div>
                 </div>
                 <div>
                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="admin-lavado">Lavado</label>

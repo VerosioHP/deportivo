@@ -49,9 +49,16 @@ class Pedido
             $pedidoId = (int) $conexion->lastInsertId();
 
             $itemStmt = $conexion->prepare(
-                'INSERT INTO pedido_items (pedido_id, producto_id, nombre, talla, precio, cantidad)
-                 VALUES (:pedido_id, :producto_id, :nombre, :talla, :precio, :cantidad)'
+                'INSERT INTO pedido_items (pedido_id, producto_id, nombre, talla, color, precio, cantidad)
+                 VALUES (:pedido_id, :producto_id, :nombre, :talla, :color, :precio, :cantidad)'
             );
+
+            foreach ($items as $item) {
+                $colorId = (int) ($item['colorId'] ?? 0);
+                if ($colorId > 0 && !Producto::verificarStockColor($colorId, (int) $item['cantidad'])) {
+                    throw new RuntimeException('Stock insuficiente');
+                }
+            }
 
             foreach ($items as $item) {
                 $itemStmt->execute([
@@ -59,9 +66,17 @@ class Pedido
                     ':producto_id' => (int) $item['id'],
                     ':nombre' => $item['nombre'],
                     ':talla' => $item['talla'],
+                    ':color' => trim((string) ($item['color'] ?? '')) ?: null,
                     ':precio' => (float) $item['precio'],
                     ':cantidad' => (int) $item['cantidad'],
                 ]);
+            }
+
+            foreach ($items as $item) {
+                $colorId = (int) ($item['colorId'] ?? 0);
+                if ($colorId > 0) {
+                    Producto::descontarStockColor($colorId, (int) $item['cantidad']);
+                }
             }
 
             $conexion->commit();

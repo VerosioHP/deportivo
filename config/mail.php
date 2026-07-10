@@ -18,4 +18,7 @@ return [
     'from_name' => 'DEPORTIVO',
     'admin_email' => 'enganchef23@gmail.com',
     'enabled' => true,
+    // URL pública del sitio (necesaria para que las imágenes se vean en el correo).
+    // Ejemplo local: 'http://localhost:3000'  |  Producción: 'https://tudominio.com'
+    'site_url' => '',
 ];

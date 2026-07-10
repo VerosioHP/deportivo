@@ -43,18 +43,33 @@ try {
                 exit;
             }
 
+            $colores = procesarColoresFormulario($_POST);
+
+            if (empty($colores)) {
+                echo json_encode(['ok' => false, 'error' => 'Agrega al menos un color con su stock.']);
+                exit;
+            }
+
+            $imagenPrincipal = $imagenResultado['path'] ?: ($action === 'update' ? (Producto::obtenerPorIdAdmin($productoId)['imagen_principal'] ?? '') : '');
+
+            if ($imagenPrincipal === '') {
+                echo json_encode(['ok' => false, 'error' => 'Sube la imagen principal del producto.']);
+                exit;
+            }
+
             $datos = [
                 'nombre' => trim($_POST['nombre'] ?? ''),
                 'precio' => $_POST['precio'] ?? 0,
                 'categoria_id' => (int) ($_POST['categoria_id'] ?? 0),
-                'imagen_principal' => $imagenResultado['path'],
+                'imagen_principal' => $imagenPrincipal,
                 'descripcion' => trim($_POST['descripcion'] ?? ''),
                 'lavado' => trim($_POST['lavado'] ?? ''),
                 'fit' => trim($_POST['fit'] ?? ''),
                 'material_info' => trim($_POST['material_info'] ?? ''),
-                'stock_estado' => $_POST['stock_estado'] ?? 'disponible',
+                'stock_estado' => Producto::calcularStockEstado(array_sum(array_column($colores, 'stock_cantidad'))),
                 'activo' => isset($_POST['activo']) ? 1 : ($action === 'create' ? 1 : 0),
                 'tallas' => Producto::parseTallasInput($_POST['tallas'] ?? ''),
+                'colores' => $colores,
             ];
 
             if ($datos['nombre'] === '' || $datos['categoria_id'] <= 0 || $datos['descripcion'] === '') {
@@ -65,10 +80,6 @@ try {
             if (empty($datos['tallas'])) {
                 echo json_encode(['ok' => false, 'error' => 'Indica al menos una talla.']);
                 exit;
-            }
-
-            if (!in_array($datos['stock_estado'], ['disponible', 'pocas_unidades', 'agotado'], true)) {
-                $datos['stock_estado'] = 'disponible';
             }
 
             if ($action === 'create') {
@@ -193,6 +204,32 @@ function resolverImagenPrincipal(string $urlImagen, ?int $productoId = null): ar
     }
 
     return ['ok' => false, 'error' => 'Sube una imagen o indica una URL.'];
+}
+
+function procesarColoresFormulario(array $post): array
+{
+    $nombres = $post['colores_nombre'] ?? [];
+    $stocks = $post['colores_stock'] ?? [];
+    $colores = [];
+
+    if (!is_array($nombres)) {
+        return [];
+    }
+
+    foreach ($nombres as $index => $nombre) {
+        $nombre = trim((string) $nombre);
+        if ($nombre === '') {
+            continue;
+        }
+
+        $colores[] = [
+            'nombre' => $nombre,
+            'stock_cantidad' => max(0, (int) ($stocks[$index] ?? 0)),
+            'orden' => count($colores),
+        ];
+    }
+
+    return $colores;
 }
 
 function resolverImagenGaleria(string $urlImagen, ?string $urlActual = null): array

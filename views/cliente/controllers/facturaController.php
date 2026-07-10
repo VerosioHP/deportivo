@@ -44,7 +44,7 @@ if (!puedeDescargarFactura($pedido)) {
 
 try {
     $pdf = FacturaPdf::generar($pedido);
-    $nombre = FacturaPdf::nombreArchivo($pedidoId);
+    $nombre = FacturaPdf::nombreArchivo($pedido);
 
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="' . $nombre . '"');

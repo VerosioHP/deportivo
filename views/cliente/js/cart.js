@@ -21,8 +21,8 @@
         document.dispatchEvent(new CustomEvent('cart:updated', { detail: { items } }));
     }
 
-    function makeKey(id, talla) {
-        return `${id}-${talla}`;
+    function makeKey(id, talla, colorSlug) {
+        return `${id}-${talla}-${colorSlug || 'default'}`;
     }
 
     function formatPrice(amount) {
@@ -35,11 +35,10 @@
     }
 
     function variantLabel(item) {
-        const lavado = translateLavado(item.lavado);
-        const fit = translateFit(item.fit);
-        const parts = [lavado, fit].filter(Boolean);
-        const variant = parts.length ? parts.join(' / ') : item.categoria || 'Estándar';
-        return `${variant} / Talla ${item.talla}`;
+        const parts = [];
+        if (item.color) parts.push(`Color ${item.color}`);
+        parts.push(`Talla ${item.talla}`);
+        return parts.join(' · ');
     }
 
     function translateLavado(value) {
@@ -91,6 +90,33 @@
         return button.dataset.productTalla;
     }
 
+    function getSelectedColor(button) {
+        if (button.dataset.productColor) {
+            return {
+                color: button.dataset.productColor,
+                colorSlug: button.dataset.productColorSlug || '',
+                colorId: Number(button.dataset.productColorId || 0),
+                stockCantidad: Number(button.dataset.productStockCantidad ?? -1),
+            };
+        }
+
+        const card = button.dataset.productTallaFrom === 'card' ? button.closest('[data-product-card]') : null;
+        const detail = button.dataset.productTallaFrom === 'selector' ? document.getElementById('color-selector') : null;
+        const selected = card?.querySelector('[data-card-color-selector] .card-color-btn.border-secondary')
+            || detail?.querySelector('.card-color-btn.border-secondary');
+
+        if (selected) {
+            return {
+                color: selected.dataset.colorNombre || '',
+                colorSlug: selected.dataset.colorSlug || '',
+                colorId: Number(selected.dataset.colorId || 0),
+                stockCantidad: Number(selected.dataset.colorStock || 0),
+            };
+        }
+
+        return { color: '', colorSlug: '', colorId: 0, stockCantidad: -1 };
+    }
+
     function getCount(items) {
         return items.reduce((sum, item) => sum + item.cantidad, 0);
     }
@@ -109,8 +135,14 @@
 
     function addItem(product) {
         const items = getItems();
-        const key = makeKey(product.id, product.talla);
+        const key = makeKey(product.id, product.talla, product.colorSlug);
         const existing = items.find((item) => item.key === key);
+        const nuevaCantidad = (existing?.cantidad || 0) + (product.cantidad || 1);
+
+        if (product.stockCantidad >= 0 && nuevaCantidad > product.stockCantidad) {
+            alert(product.color ? `Solo quedan ${product.stockCantidad} en color ${product.color}.` : 'No hay suficiente stock.');
+            return false;
+        }
 
         if (existing) {
             existing.cantidad += product.cantidad || 1;
@@ -122,6 +154,10 @@
                 precio: Number(product.precio),
                 imagen: product.imagen,
                 talla: product.talla,
+                color: product.color || '',
+                colorSlug: product.colorSlug || '',
+                colorId: product.colorId || 0,
+                stockCantidad: product.stockCantidad ?? -1,
                 lavado: product.lavado || '',
                 fit: product.fit || '',
                 categoria: product.categoria || '',
@@ -131,6 +167,7 @@
         }
 
         saveItems(items);
+        return true;
     }
 
     function removeItem(key) {
@@ -324,12 +361,18 @@
     }
 
     function readProductFromButton(button) {
+        const colorInfo = getSelectedColor(button);
+
         return {
             id: Number(button.dataset.productId),
             nombre: button.dataset.productNombre,
             precio: Number(button.dataset.productPrecio),
             imagen: button.dataset.productImagen,
-            talla: button.dataset.productTalla,
+            talla: getSelectedTalla(button),
+            color: colorInfo.color || '',
+            colorSlug: colorInfo.colorSlug || '',
+            colorId: colorInfo.colorId || 0,
+            stockCantidad: colorInfo.stockCantidad ?? Number(button.dataset.productStockCantidad ?? -1),
             lavado: button.dataset.productLavado || '',
             fit: button.dataset.productFit || '',
             categoria: button.dataset.productCategoria || '',
@@ -364,11 +407,12 @@
                 const product = readProductFromButton(addButton);
                 product.talla = getSelectedTalla(addButton);
 
-                if (!product.id || !product.talla) {
+                if (!product.id || !product.talla) return;
+                if (product.stockCantidad === 0) {
+                    alert(product.color ? `Agotado en color ${product.color}.` : 'Producto agotado.');
                     return;
                 }
-
-                addItem(product);
+                if (!addItem(product)) return;
                 openModal();
             }
 

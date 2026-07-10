@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/moneda.php';
+require_once __DIR__ . '/../models/Producto.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -13,6 +14,7 @@ class FacturaPdf
             throw new RuntimeException('Dompdf no está instalado. Ejecuta: composer install');
         }
 
+        $pedido['items'] = self::prepararItemsParaPdf($pedido['items'] ?? []);
         $html = self::construirHtml($pedido);
 
         $options = new Options();
@@ -27,9 +29,30 @@ class FacturaPdf
         return $dompdf->output();
     }
 
-    public static function nombreArchivo(int $pedidoId): string
+    public static function nombreArchivo(array $pedido): string
     {
-        return 'factura-deportivo-' . $pedidoId . '.pdf';
+        return 'factura-deportiva-' . self::slugCliente($pedido) . '.pdf';
+    }
+
+    private static function slugCliente(array $pedido): string
+    {
+        $primerNombre = self::primerPalabra(trim($pedido['nombre'] ?? ''));
+        $primerApellido = self::primerPalabra(trim($pedido['apellido'] ?? ''));
+        $base = trim($primerNombre . ' ' . $primerApellido);
+        $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $base), '-'));
+
+        return $slug !== '' ? $slug : 'cliente';
+    }
+
+    private static function primerPalabra(string $texto): string
+    {
+        if ($texto === '') {
+            return '';
+        }
+
+        $partes = preg_split('/\s+/u', $texto);
+
+        return $partes[0] ?? '';
     }
 
     private static function construirHtml(array $pedido): string
@@ -50,13 +73,17 @@ class FacturaPdf
         $filas = '';
         foreach ($pedido['items'] ?? [] as $item) {
             $nombre = htmlspecialchars($item['nombre'] ?? 'Producto');
+            $color = self::etiquetaColorHtml($item['color'] ?? null);
             $talla = htmlspecialchars($item['talla'] ?? '-');
             $cantidad = (int) ($item['cantidad'] ?? 1);
             $precio = deportivo_formatear_precio((float) ($item['precio'] ?? 0));
             $subtotal = deportivo_formatear_precio((float) ($item['precio'] ?? 0) * $cantidad);
+            $imagenHtml = self::celdaImagenHtml((string) ($item['imagen_data'] ?? ''));
 
             $filas .= "<tr>
+                <td class=\"img-cell\">{$imagenHtml}</td>
                 <td>{$nombre}</td>
+                <td class=\"center\">{$color}</td>
                 <td class=\"center\">{$talla}</td>
                 <td class=\"center\">{$cantidad}</td>
                 <td class=\"right\">{$precio}</td>
@@ -138,6 +165,29 @@ class FacturaPdf
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
+        table.items .img-cell {
+            width: 135px;
+            padding: 10px 8px;
+        }
+        table.items .product-img {
+            width: 115px;
+            height: 153px;
+            object-fit: cover;
+            border: 1px solid #c7c6ca;
+            display: block;
+            background: #fff;
+        }
+        table.items .img-placeholder {
+            width: 115px;
+            height: 153px;
+            border: 1px solid #c7c6ca;
+            background: #ececee;
+            color: #919094;
+            font-size: 9px;
+            text-align: center;
+            line-height: 153px;
+            display: block;
+        }
         .center { text-align: center; }
         .right { text-align: right; }
         .totals {
@@ -198,7 +248,9 @@ class FacturaPdf
     <table class="items">
         <thead>
             <tr>
+                <th>Imagen</th>
                 <th>Producto</th>
+                <th class="center">Color</th>
                 <th class="center">Talla</th>
                 <th class="center">Cant.</th>
                 <th class="right">Precio</th>
@@ -252,5 +304,91 @@ HTML;
             'cancelado' => 'Cancelado',
             default => 'Pendiente',
         };
+    }
+
+    private static function prepararItemsParaPdf(array $items): array
+    {
+        require_once __DIR__ . '/../config/paths.php';
+        require_once __DIR__ . '/../models/Pedido.php';
+
+        $items = Pedido::enriquecerItemsConImagen($items);
+
+        foreach ($items as &$item) {
+            $item['imagen_data'] = self::imagenComoDataUri((string) ($item['imagen'] ?? ''));
+        }
+
+        unset($item);
+
+        return $items;
+    }
+
+    private static function imagenComoDataUri(string $url): string
+    {
+        $path = self::resolverRutaLocalImagen($url);
+
+        if ($path === '' || !is_readable($path)) {
+            return '';
+        }
+
+        $mime = mime_content_type($path) ?: 'image/jpeg';
+        $data = base64_encode((string) file_get_contents($path));
+
+        return "data:{$mime};base64,{$data}";
+    }
+
+    private static function resolverRutaLocalImagen(string $url): string
+    {
+        if ($url === '') {
+            return '';
+        }
+
+        if (!defined('DEPORTIVO_ROOT')) {
+            require_once __DIR__ . '/../config/paths.php';
+        }
+
+        $relative = str_replace('\\', '/', $url);
+
+        if (preg_match('#^https?://#i', $relative)) {
+            $parsed = parse_url($relative);
+            $relative = ltrim($parsed['path'] ?? '', '/');
+        } else {
+            $relative = ltrim($relative, '/');
+        }
+
+        $webBase = ltrim(deportivo_web_base(), '/');
+        if ($webBase !== '' && str_starts_with($relative, $webBase . '/')) {
+            $relative = substr($relative, strlen($webBase) + 1);
+        }
+
+        $fullPath = DEPORTIVO_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+
+        return is_file($fullPath) ? $fullPath : '';
+    }
+
+    private static function celdaImagenHtml(string $dataUri): string
+    {
+        if ($dataUri === '') {
+            return '<span class="img-placeholder">Sin foto</span>';
+        }
+
+        $src = htmlspecialchars($dataUri, ENT_QUOTES, 'UTF-8');
+
+        return "<img class=\"product-img\" src=\"{$src}\" alt=\"Producto\" />";
+    }
+
+    private static function etiquetaColorHtml(?string $color): string
+    {
+        $nombre = trim((string) $color);
+        if ($nombre === '') {
+            return '-';
+        }
+
+        $hex = htmlspecialchars(Producto::colorHex($nombre));
+        $texto = htmlspecialchars($nombre);
+
+        return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'
+            . $hex
+            . ';border:1px solid #c7c6ca;vertical-align:middle;margin-right:5px;"></span>'
+            . $texto;
     }
 }

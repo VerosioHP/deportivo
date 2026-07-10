@@ -38,7 +38,7 @@ class Producto
         $productos = $stmt->fetchAll();
 
         foreach ($productos as &$producto) {
-            $producto['tallas'] = self::obtenerTallas((int) $producto['id']);
+            self::enriquecerParaCatalogo($producto);
         }
 
         return $productos;
@@ -64,8 +64,7 @@ class Producto
             return null;
         }
 
-        $producto['tallas'] = self::obtenerTallas($id);
-        $producto['imagenes'] = self::obtenerImagenes($id);
+        self::enriquecerParaCatalogo($producto);
 
         return $producto;
     }
@@ -92,10 +91,22 @@ class Producto
         $productos = $stmt->fetchAll();
 
         foreach ($productos as &$producto) {
-            $producto['tallas'] = self::obtenerTallas((int) $producto['id']);
+            self::enriquecerParaCatalogo($producto);
         }
 
         return $productos;
+    }
+
+    public static function enriquecerParaCatalogo(array &$producto): void
+    {
+        $id = (int) $producto['id'];
+        $producto['tallas'] = self::obtenerTallas($id);
+        $producto['colores'] = self::obtenerColores($id);
+
+        if (!empty($producto['colores'])) {
+            $total = self::stockTotalColores($producto['colores']);
+            $producto['stock_estado'] = self::calcularStockEstado($total);
+        }
     }
 
     public static function obtenerTallas(int $productoId): array
@@ -126,6 +137,114 @@ class Producto
         $stmt->execute();
 
         return $stmt->fetchAll();
+    }
+
+    public static function obtenerColores(int $productoId): array
+    {
+        global $conexion;
+
+        try {
+            $stmt = $conexion->prepare(
+                'SELECT id, nombre, imagen, stock_cantidad, orden
+                 FROM producto_colores WHERE producto_id = :producto_id
+                 ORDER BY orden ASC, id ASC'
+            );
+            $stmt->bindParam(':producto_id', $productoId, PDO::PARAM_INT);
+            $stmt->execute();
+            $filas = $stmt->fetchAll();
+        } catch (Throwable) {
+            return [];
+        }
+
+        foreach ($filas as &$fila) {
+            $fila['stock_cantidad'] = (int) ($fila['stock_cantidad'] ?? 0);
+            $fila['slug'] = self::slugColor((string) $fila['nombre']);
+        }
+
+        return $filas;
+    }
+
+    public static function obtenerColorPorId(int $colorId): ?array
+    {
+        global $conexion;
+
+        try {
+            $stmt = $conexion->prepare(
+                'SELECT id, producto_id, nombre, imagen, stock_cantidad
+                 FROM producto_colores WHERE id = :id LIMIT 1'
+            );
+            $stmt->bindParam(':id', $colorId, PDO::PARAM_INT);
+            $stmt->execute();
+            $fila = $stmt->fetch();
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (!$fila) {
+            return null;
+        }
+
+        $fila['stock_cantidad'] = (int) $fila['stock_cantidad'];
+        $fila['slug'] = self::slugColor((string) $fila['nombre']);
+
+        return $fila;
+    }
+
+    public static function slugColor(string $nombre): string
+    {
+        $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $nombre), '-'));
+
+        return $slug !== '' ? $slug : 'color';
+    }
+
+    public static function colorHex(string $nombre): string
+    {
+        $mapa = [
+            'blanco' => '#f5f5f5', 'white' => '#f5f5f5',
+            'negro' => '#1a1a1a', 'black' => '#1a1a1a',
+            'gris' => '#757575', 'gray' => '#757575', 'grey' => '#757575',
+            'rojo' => '#c62828', 'red' => '#c62828',
+            'azul' => '#1565c0', 'blue' => '#1565c0',
+            'verde' => '#2e7d32', 'green' => '#2e7d32',
+            'amarillo' => '#f9a825', 'yellow' => '#f9a825',
+            'naranja' => '#ef6c00', 'orange' => '#ef6c00',
+            'rosa' => '#ec407a', 'pink' => '#ec407a',
+            'morado' => '#6a1b9a', 'purple' => '#6a1b9a',
+            'beige' => '#d7ccc8', 'marino' => '#0d47a1', 'navy' => '#0d47a1',
+        ];
+
+        return $mapa[strtolower(trim($nombre))] ?? '#9e9e9e';
+    }
+
+    public static function stockTotalColores(array $colores): int
+    {
+        return array_sum(array_map(fn ($c) => (int) ($c['stock_cantidad'] ?? 0), $colores));
+    }
+
+    public static function calcularStockEstado(int $cantidad): string
+    {
+        if ($cantidad <= 0) {
+            return 'agotado';
+        }
+        if ($cantidad <= 5) {
+            return 'pocas_unidades';
+        }
+
+        return 'disponible';
+    }
+
+    public static function mensajeStockColor(int $cantidad, string $colorNombre): string
+    {
+        $color = trim($colorNombre);
+
+        if ($cantidad <= 0) {
+            return $color !== '' ? "Agotado en color {$color}" : 'Agotado temporalmente';
+        }
+        if ($cantidad <= 5) {
+            return $color !== '' ? "¡Solo quedan {$cantidad} en color {$color}!" : "¡Solo quedan {$cantidad} unidades!";
+        }
+
+        return $color !== '' ? "Quedan {$cantidad} unidades en color {$color}" : "Quedan {$cantidad} unidades disponibles";
     }
 
     public static function etiquetaStock(string $estado): string
@@ -203,7 +322,7 @@ class Producto
         $productos = $stmt->fetchAll();
 
         foreach ($productos as &$producto) {
-            $producto['tallas'] = self::obtenerTallas((int) $producto['id']);
+            self::enriquecerParaCatalogo($producto);
         }
 
         return $productos;
@@ -285,6 +404,7 @@ class Producto
 
         $producto['tallas'] = self::obtenerTallas($id);
         $producto['imagenes'] = self::obtenerImagenes($id);
+        $producto['colores'] = self::obtenerColores($id);
 
         return $producto;
     }
@@ -328,6 +448,11 @@ class Producto
 
         self::sincronizarTallas($id, $datos['tallas']);
 
+        if (isset($datos['colores'])) {
+            self::sincronizarColores($id, $datos['colores'], $datos['imagen_principal']);
+            self::recalcularStockProducto($id);
+        }
+
         return true;
     }
 
@@ -360,6 +485,11 @@ class Producto
 
         $id = (int) $conexion->lastInsertId();
         self::sincronizarTallas($id, $datos['tallas']);
+
+        if (!empty($datos['colores'])) {
+            self::sincronizarColores($id, $datos['colores'], $datos['imagen_principal']);
+            self::recalcularStockProducto($id);
+        }
 
         return $id;
     }
@@ -395,6 +525,73 @@ class Producto
                 ':talla' => $talla,
             ]);
         }
+    }
+
+    public static function sincronizarColores(int $productoId, array $colores, string $imagenPrincipal): void
+    {
+        global $conexion;
+
+        try {
+            $conexion->prepare('DELETE FROM producto_colores WHERE producto_id = :id')
+                ->execute([':id' => $productoId]);
+        } catch (Throwable) {
+            return;
+        }
+
+        $stmt = $conexion->prepare(
+            'INSERT INTO producto_colores (producto_id, nombre, imagen, stock_cantidad, orden)
+             VALUES (:producto_id, :nombre, :imagen, :stock_cantidad, :orden)'
+        );
+
+        foreach ($colores as $index => $color) {
+            $nombre = trim((string) ($color['nombre'] ?? ''));
+            if ($nombre === '') {
+                continue;
+            }
+
+            $stmt->execute([
+                ':producto_id' => $productoId,
+                ':nombre' => $nombre,
+                ':imagen' => $imagenPrincipal,
+                ':stock_cantidad' => max(0, (int) ($color['stock_cantidad'] ?? 0)),
+                ':orden' => (int) ($color['orden'] ?? $index),
+            ]);
+        }
+    }
+
+    public static function recalcularStockProducto(int $productoId): void
+    {
+        global $conexion;
+
+        $estado = self::calcularStockEstado(self::stockTotalColores(self::obtenerColores($productoId)));
+
+        $conexion->prepare('UPDATE productos SET stock_estado = :estado WHERE id = :id')
+            ->execute([':estado' => $estado, ':id' => $productoId]);
+    }
+
+    public static function verificarStockColor(int $colorId, int $cantidad): bool
+    {
+        $color = self::obtenerColorPorId($colorId);
+
+        return $color && (int) $color['stock_cantidad'] >= $cantidad;
+    }
+
+    public static function descontarStockColor(int $colorId, int $cantidad): bool
+    {
+        global $conexion;
+
+        $color = self::obtenerColorPorId($colorId);
+        if (!$color || (int) $color['stock_cantidad'] < $cantidad) {
+            return false;
+        }
+
+        $nueva = (int) $color['stock_cantidad'] - $cantidad;
+        $conexion->prepare('UPDATE producto_colores SET stock_cantidad = :c WHERE id = :id')
+            ->execute([':c' => $nueva, ':id' => $colorId]);
+
+        self::recalcularStockProducto((int) $color['producto_id']);
+
+        return true;
     }
 
     private static function generarSlugUnico(string $nombre, ?int $excluirId = null): string

@@ -20,6 +20,11 @@ $relacionados = Producto::obtenerRelacionados(
 
 $materialItems = Producto::parseMaterialInfo($producto['material_info']);
 $primeraTalla = $producto['tallas'][0] ?? null;
+$colores = $producto['colores'] ?? [];
+$tieneColores = count($colores) > 0;
+$colorDefault = $tieneColores ? $colores[0] : null;
+$stockColorDefault = (int) ($colorDefault['stock_cantidad'] ?? 0);
+$agotado = $tieneColores ? $stockColorDefault <= 0 : ($producto['stock_estado'] ?? '') === 'agotado';
 
 require_once __DIR__ . '/../includes/sport-images.php';
 require_once __DIR__ . '/../includes/size-guide.php';
@@ -27,6 +32,9 @@ require_once __DIR__ . '/../includes/size-guide.php';
 $guiaTallas = deportivo_guia_tallas($producto['categoria_slug'] ?? 'camisetas');
 $productoPrincipal = $producto;
 $imagenProductoUrl = Producto::urlImagen($producto['imagen_principal'], true);
+$mensajeStock = $tieneColores
+    ? Producto::mensajeStockColor($stockColorDefault, $colorDefault['nombre'] ?? '')
+    : Producto::mensajeStock($producto['stock_estado']);
 
 $navInViews = true;
 $cartBasePath = $assetBase;
@@ -101,8 +109,9 @@ $cartUrl = 'carrito_compras.php';
                     <p class="font-headline-sm text-headline-sm text-secondary"><?= Producto::formatearPrecio((float) $producto['precio']) ?></p>
                 </header>
                 <!-- Stock Indicator -->
-                <div class="flex items-center gap-2 text-label-md font-label-md text-secondary">
-                    <span class="w-2 h-2 rounded-full bg-secondary"></span> <?= htmlspecialchars(Producto::mensajeStock($producto['stock_estado'])) ?>
+                <div class="flex items-center gap-2 text-label-md font-label-md text-secondary" id="stock-message">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span id="stock-message-text"><?= htmlspecialchars($mensajeStock) ?></span>
                 </div>
                 <div class="flex flex-col gap-6">
                     <div class="flex flex-col gap-4">
@@ -117,21 +126,28 @@ $cartUrl = 'carrito_compras.php';
                             <?php endforeach; ?>
                         </div>
                     </div>
+                    <?php if ($tieneColores): ?>
+                    <?php $context = 'detail'; include __DIR__ . '/../includes/producto-color-selector.php'; ?>
+                    <?php endif; ?>
                     <div class="flex flex-col gap-4 mt-4">
                         <button type="button"
-                            class="w-full bg-secondary text-on-secondary py-5 font-label-md uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98] text-center"
-                            data-add-to-cart
-                            data-product-talla-from="selector"
+                            class="w-full bg-secondary text-on-secondary py-5 font-label-md uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98] text-center disabled:opacity-50 disabled:pointer-events-none"
+                            data-add-to-cart data-product-talla-from="selector"
                             data-product-id="<?= (int) $producto['id'] ?>"
                             data-product-nombre="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES) ?>"
                             data-product-precio="<?= (float) $producto['precio'] ?>"
-                            data-product-imagen="<?= htmlspecialchars(Producto::urlImagen($producto['imagen_principal'], true), ENT_QUOTES) ?>"
+                            data-product-imagen="<?= htmlspecialchars($imagenProductoUrl, ENT_QUOTES) ?>"
                             data-product-talla="<?= htmlspecialchars($primeraTalla ?? 'M', ENT_QUOTES) ?>"
+                            data-product-color="<?= htmlspecialchars($colorDefault['nombre'] ?? '', ENT_QUOTES) ?>"
+                            data-product-color-slug="<?= htmlspecialchars($colorDefault['slug'] ?? '', ENT_QUOTES) ?>"
+                            data-product-color-id="<?= (int) ($colorDefault['id'] ?? 0) ?>"
+                            data-product-stock-cantidad="<?= $stockColorDefault ?>"
                             data-product-lavado="<?= htmlspecialchars($producto['lavado'] ?? '', ENT_QUOTES) ?>"
                             data-product-fit="<?= htmlspecialchars($producto['fit'] ?? '', ENT_QUOTES) ?>"
                             data-product-categoria="<?= htmlspecialchars($producto['categoria_nombre'] ?? '', ENT_QUOTES) ?>"
-                            data-product-stock="<?= htmlspecialchars($producto['stock_estado'], ENT_QUOTES) ?>">
-                            Añadir al carrito
+                            data-product-stock="<?= htmlspecialchars($producto['stock_estado'], ENT_QUOTES) ?>"
+                            <?= $agotado ? 'disabled' : '' ?>>
+                            <?= $agotado ? 'Agotado' : 'Añadir al carrito' ?>
                         </button>
                         <button type="button"
                             class="w-full border border-primary text-primary py-5 font-label-md uppercase tracking-widest hover:bg-surface-container transition-all active:scale-[0.98]"

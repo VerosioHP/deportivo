@@ -66,17 +66,30 @@ class MailPedido
             return ['admin' => false, 'cliente' => false];
         }
 
-        $pedido['items'] = Pedido::enriquecerItemsConImagen($pedido['items'] ?? []);
-
         return [
             'admin' => self::enviarNotificacionAdmin($pedido),
             'cliente' => self::enviarConfirmacionCliente($pedido),
         ];
     }
 
+    private static function encabezadoTablaItemsHtml(): string
+    {
+        return <<<'HTML'
+            <tr style="background:#f5f5f5;">
+                <th align="left">Producto</th>
+                <th align="left">Color</th>
+                <th align="left">Talla</th>
+                <th align="center">Cant.</th>
+                <th align="right">Precio</th>
+                <th align="right">Subtotal</th>
+            </tr>
+HTML;
+    }
+
     private static function construirHtmlAdmin(array $pedido): string
     {
         $pedidoId = (int) $pedido['id'];
+        $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
         $notasHtml = !empty($pedido['notas'])
             ? '<p><strong>Notas:</strong> ' . htmlspecialchars($pedido['notas']) . '</p>'
@@ -110,13 +123,7 @@ class MailPedido
     <h3>Productos</h3>
     <table style="width:100%; border-collapse: collapse;" cellpadding="8">
         <thead>
-            <tr style="background:#f5f5f5;">
-                <th align="left">Producto</th>
-                <th align="left">Talla</th>
-                <th align="center">Cant.</th>
-                <th align="right">Precio</th>
-                <th align="right">Subtotal</th>
-            </tr>
+            {$tablaEncabezado}
         </thead>
         <tbody>{$itemsHtml}</tbody>
     </table>
@@ -135,6 +142,7 @@ HTML;
     {
         $pedidoId = (int) $pedido['id'];
         $nombre = htmlspecialchars($pedido['nombre']);
+        $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
         $notasHtml = !empty($pedido['notas'])
             ? '<p><strong>Notas:</strong> ' . htmlspecialchars($pedido['notas']) . '</p>'
@@ -163,13 +171,7 @@ HTML;
     <h3>Resumen del pedido</h3>
     <table style="width:100%; border-collapse: collapse;" cellpadding="8">
         <thead>
-            <tr style="background:#f5f5f5;">
-                <th align="left">Producto</th>
-                <th align="left">Talla</th>
-                <th align="center">Cant.</th>
-                <th align="right">Precio</th>
-                <th align="right">Subtotal</th>
-            </tr>
+            {$tablaEncabezado}
         </thead>
         <tbody>{$itemsHtml}</tbody>
     </table>
@@ -190,6 +192,7 @@ HTML;
     {
         $pedidoId = (int) $pedido['id'];
         $nombre = htmlspecialchars($pedido['nombre']);
+        $tablaEncabezado = self::encabezadoTablaItemsHtml();
         $itemsHtml = self::construirFilasItemsHtml($pedido['items'] ?? []);
         $total = deportivo_formatear_precio((float) $pedido['total']);
 
@@ -212,13 +215,7 @@ HTML;
     <h3>Resumen del pedido</h3>
     <table style="width:100%; border-collapse: collapse;" cellpadding="8">
         <thead>
-            <tr style="background:#f5f5f5;">
-                <th align="left">Producto</th>
-                <th align="left">Talla</th>
-                <th align="center">Cant.</th>
-                <th align="right">Precio</th>
-                <th align="right">Subtotal</th>
-            </tr>
+            {$tablaEncabezado}
         </thead>
         <tbody>{$itemsHtml}</tbody>
     </table>
@@ -249,7 +246,8 @@ HTML;
         foreach ($pedido['items'] ?? [] as $index => $item) {
             $num = $index + 1;
             $cantidad = (int) ($item['cantidad'] ?? 1);
-            $lineas[] = "{$num}. {$item['nombre']} | Talla: {$item['talla']} | Cant: {$cantidad}";
+            $linea = "{$num}. {$item['nombre']} | Color: " . ($item['color'] ?? '-') . " | Talla: {$item['talla']} | Cant: {$cantidad}";
+            $lineas[] = $linea;
         }
 
         $lineas[] = '';
@@ -266,13 +264,15 @@ HTML;
 
         foreach ($items as $item) {
             $nombre = htmlspecialchars($item['nombre'] ?? 'Producto');
+            $color = self::etiquetaColorHtml($item['color'] ?? null);
             $talla = htmlspecialchars($item['talla'] ?? '-');
             $cantidad = (int) ($item['cantidad'] ?? 1);
             $precio = deportivo_formatear_precio((float) ($item['precio'] ?? 0));
             $subtotal = deportivo_formatear_precio((float) ($item['precio'] ?? 0) * $cantidad);
 
-            $filas .= "<tr>
+            $filas .= "<tr style=\"border-bottom:1px solid #eee;\">
                 <td>{$nombre}</td>
+                <td>{$color}</td>
                 <td>{$talla}</td>
                 <td align=\"center\">{$cantidad}</td>
                 <td align=\"right\">{$precio}</td>
@@ -316,7 +316,7 @@ HTML;
             $num = $index + 1;
             $cantidad = (int) ($item['cantidad'] ?? 1);
             $precio = (float) ($item['precio'] ?? 0);
-            $lineas[] = "{$num}. {$item['nombre']} | Talla: {$item['talla']} | Cant: {$cantidad} | " . deportivo_formatear_precio($precio);
+            $lineas[] = "{$num}. {$item['nombre']} | Color: " . ($item['color'] ?? '-') . " | Talla: {$item['talla']} | Cant: {$cantidad} | " . deportivo_formatear_precio($precio);
         }
 
         $lineas[] = '';
@@ -325,6 +325,23 @@ HTML;
         $lineas[] = 'Total: ' . deportivo_formatear_precio((float) $pedido['total']);
 
         return implode("\n", $lineas);
+    }
+
+    private static function etiquetaColorHtml(?string $color): string
+    {
+        $nombre = trim((string) $color);
+        if ($nombre === '') {
+            return '-';
+        }
+
+        require_once __DIR__ . '/../models/Producto.php';
+        $hex = htmlspecialchars(Producto::colorHex($nombre));
+        $texto = htmlspecialchars($nombre);
+
+        return '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'
+            . $hex
+            . ';border:1px solid #c7c6ca;vertical-align:middle;margin-right:6px;"></span>'
+            . $texto;
     }
 
     private static function config(): array
