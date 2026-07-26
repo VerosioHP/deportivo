@@ -80,7 +80,7 @@ $cartUrl = 'carrito_compras.php';
                             </div>
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="telefono">Teléfono *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="telefono" name="telefono" type="tel" required placeholder="+34 600 000 000" />
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="telefono" name="telefono" type="tel" required placeholder="+57 300 000 000" />
                             </div>
                         </div>
                     </div>
@@ -94,11 +94,11 @@ $cartUrl = 'carrito_compras.php';
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="ciudad">Ciudad *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="ciudad" name="ciudad" type="text" required placeholder="Madrid" />
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="ciudad" name="ciudad" type="text" required placeholder="Medellín" />
                             </div>
                             <div>
-                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="provincia">Provincia *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="provincia" name="provincia" type="text" required placeholder="Madrid" />
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="provincia">Departamento *</label>
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="provincia" name="provincia" type="text" required placeholder="Antioquia" />
                             </div>
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="codigo_postal">Código postal (opcional)</label>
@@ -114,11 +114,11 @@ $cartUrl = 'carrito_compras.php';
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
                         <a href="carrito_compras.php" class="flex-1 text-center py-4 border border-primary text-primary font-label-md uppercase tracking-widest no-underline hover:bg-surface-container transition-all">Volver al carrito</a>
                         <button type="submit" class="flex-1 py-4 bg-secondary text-on-secondary font-label-md uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                            Confirmar pedido
-                            <span class="material-symbols-outlined text-sm">chat</span>
+                            Continuar al pago
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </button>
                     </div>
-                    <p class="font-body-md text-body-md text-on-surface-variant pt-2">Al confirmar, guardaremos tu pedido y se abrirá WhatsApp con el resumen para que lo envíes a la tienda.</p>
+                    <p class="font-body-md text-body-md text-on-surface-variant pt-2">Al continuar, te indicaremos la forma de pago según tu ciudad (contraentrega o transferencia).</p>
                 </form>
             </section>
 

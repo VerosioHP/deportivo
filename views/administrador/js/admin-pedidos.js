@@ -34,10 +34,35 @@
 
     function numeroPedido(pedido) {
         const numero = String(pedido.numero ?? '').trim();
-        if (/^\d{5}$/.test(numero)) {
-            return numero;
+        const digitos = /^\d{5}$/.test(numero) ? numero : String(pedido.id ?? '').padStart(5, '0');
+        return `PED-${digitos}`;
+    }
+
+    function etiquetaMetodoPago(metodo) {
+        const mapa = {
+            contraentrega: 'Contraentrega',
+            transferencia: 'Transferencia',
+        };
+        return mapa[metodo] || 'Sin definir';
+    }
+
+    function etiquetaZona(zona) {
+        const mapa = {
+            metropolitana: 'Área metropolitana',
+            nacional: 'Resto del país',
+        };
+        return mapa[zona] || 'Sin definir';
+    }
+
+    function urlComprobante(ruta) {
+        if (!ruta) {
+            return '';
         }
-        return String(pedido.id ?? '').padStart(5, '0');
+        if (/^https?:\/\//i.test(ruta) || ruta.startsWith('//')) {
+            return ruta;
+        }
+        const base = (config.uploadsBasePath || '/').replace(/\/?$/, '/');
+        return base + String(ruta).replace(/^\//, '');
     }
 
     function formatearPrecio(valor) {
@@ -120,12 +145,13 @@
 
             tbody.innerHTML = pedidos.map((pedido) => `
                 <tr data-pedido-id="${pedido.id}">
-                    <td class="font-mono">#${numeroPedido(pedido)}</td>
+                    <td class="font-mono">${escapeHtml(numeroPedido(pedido))}</td>
                     <td>${formatearFecha(pedido.fecha_creacion)}</td>
                     <td>${escapeHtml(pedido.nombre)} ${escapeHtml(pedido.apellido)}</td>
                     <td>${escapeHtml(pedido.email)}</td>
                     <td class="font-mono">${formatearPrecio(pedido.total)}</td>
                     <td><span class="pedido-estado pedido-estado--${pedido.estado}">${etiquetaEstado(pedido.estado)}</span></td>
+                    <td class="font-body-sm">${escapeHtml(etiquetaMetodoPago(pedido.metodo_pago))}</td>
                     <td><span class="material-symbols-outlined text-on-surface-variant text-base">chevron_right</span></td>
                 </tr>
             `).join('');
@@ -166,6 +192,7 @@
         document.body.style.overflow = '';
         pedidoActualId = null;
         detalleMensaje.classList.add('hidden');
+        cerrarComprobanteLightbox();
     }
 
     async function verDetalle(pedidoId) {
@@ -183,7 +210,7 @@
             }
 
             const pedido = data.pedido;
-            document.getElementById('pedido-detalle-titulo').textContent = `Pedido #${numeroPedido(pedido)}`;
+            document.getElementById('pedido-detalle-titulo').textContent = `Pedido ${numeroPedido(pedido)}`;
             estadoSelect.value = pedido.estado;
 
             const itemsHtml = (pedido.items || []).map((item) => {
@@ -209,6 +236,19 @@
                 ? `<p class="font-body-md mt-2"><strong>Notas:</strong> ${escapeHtml(pedido.notas)}</p>`
                 : '';
 
+            const comprobanteUrl = urlComprobante(pedido.comprobante_pago);
+            const comprobanteHtml = comprobanteUrl
+                ? `<div class="pago-comprobante-preview">
+                        <button type="button" class="pago-comprobante-thumb" data-comprobante-lightbox="${escapeHtml(comprobanteUrl)}" title="Ampliar comprobante">
+                            <img src="${escapeHtml(comprobanteUrl)}" alt="Comprobante de pago" loading="lazy" />
+                            <span class="pago-comprobante-hint">
+                                <span class="material-symbols-outlined">zoom_in</span>
+                                Ver
+                            </span>
+                        </button>
+                   </div>`
+                : '<p class="font-body-md text-on-surface-variant mt-2">Sin comprobante adjunto.</p>';
+
             modalContenido.innerHTML = `
                 <div class="pedido-detalle-grid">
                     <div class="pedido-detalle-seccion">
@@ -221,8 +261,15 @@
                         <h3>Envío</h3>
                         <p class="font-body-md">${escapeHtml(pedido.direccion)}</p>
                         <p class="font-body-md text-on-surface-variant">${escapeHtml(pedido.codigo_postal)} ${escapeHtml(pedido.ciudad)}, ${escapeHtml(pedido.provincia)}</p>
+                        <p class="font-body-md text-on-surface-variant mt-2"><strong>Zona:</strong> ${escapeHtml(etiquetaZona(pedido.zona_envio))}</p>
                         ${notasHtml}
                     </div>
+                </div>
+
+                <div class="pedido-detalle-seccion">
+                    <h3>Pago</h3>
+                    <p class="font-body-md"><strong>Método:</strong> ${escapeHtml(etiquetaMetodoPago(pedido.metodo_pago))}</p>
+                    ${comprobanteHtml}
                 </div>
 
                 <div class="pedido-detalle-seccion">
@@ -252,9 +299,42 @@
                     <p class="font-body-sm text-on-surface-variant mt-2">Fecha: ${formatearFecha(pedido.fecha_creacion)}</p>
                 </div>
             `;
+
+            const thumbComprobante = modalContenido.querySelector('[data-comprobante-lightbox]');
+            if (thumbComprobante) {
+                thumbComprobante.addEventListener('click', () => {
+                    abrirComprobanteLightbox(thumbComprobante.dataset.comprobanteLightbox);
+                });
+            }
         } catch (err) {
             modalContenido.innerHTML = '<p class="text-error font-body-md">Error de conexión.</p>';
         }
+    }
+
+    function abrirComprobanteLightbox(url) {
+        const lightbox = document.getElementById('comprobante-lightbox');
+        const lightboxImg = document.getElementById('comprobante-lightbox-img');
+
+        if (!lightbox || !lightboxImg || !url) {
+            return;
+        }
+
+        lightboxImg.src = url;
+        lightbox.hidden = false;
+        lightbox.classList.remove('hidden');
+    }
+
+    function cerrarComprobanteLightbox() {
+        const lightbox = document.getElementById('comprobante-lightbox');
+        const lightboxImg = document.getElementById('comprobante-lightbox-img');
+
+        if (!lightbox || !lightboxImg) {
+            return;
+        }
+
+        lightbox.classList.add('hidden');
+        lightbox.hidden = true;
+        lightboxImg.src = '';
     }
 
     async function guardarEstado() {
@@ -325,8 +405,32 @@
     modalBackdrop.addEventListener('click', cerrarModal);
     btnGuardarEstado.addEventListener('click', guardarEstado);
 
+    const lightbox = document.getElementById('comprobante-lightbox');
+    const lightboxCerrar = document.getElementById('comprobante-lightbox-cerrar');
+
+    if (lightboxCerrar) {
+        lightboxCerrar.addEventListener('click', cerrarComprobanteLightbox);
+    }
+
+    if (lightbox) {
+        lightbox.addEventListener('click', (event) => {
+            if (event.target === lightbox) {
+                cerrarComprobanteLightbox();
+            }
+        });
+    }
+
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        if (lightbox && !lightbox.classList.contains('hidden')) {
+            cerrarComprobanteLightbox();
+            return;
+        }
+
+        if (!modal.classList.contains('hidden')) {
             cerrarModal();
         }
     });

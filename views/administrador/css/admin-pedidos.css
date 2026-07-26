@@ -136,3 +136,8 @@
 #pedido-detalle-modal.flex {
     display: flex;
 }
+
+/* Lightbox del comprobante por encima del modal de detalle */
+.pago-comprobante-lightbox {
+    z-index: 120;
+}

@@ -20,11 +20,7 @@ $relacionados = Producto::obtenerRelacionados(
 
 $materialItems = Producto::parseMaterialInfo($producto['material_info']);
 $primeraTalla = $producto['tallas'][0] ?? null;
-$colores = $producto['colores'] ?? [];
-$tieneColores = count($colores) > 0;
-$colorDefault = $tieneColores ? $colores[0] : null;
-$stockColorDefault = (int) ($colorDefault['stock_cantidad'] ?? 0);
-$agotado = $tieneColores ? $stockColorDefault <= 0 : ($producto['stock_estado'] ?? '') === 'agotado';
+$agotado = ($producto['stock_estado'] ?? '') === 'agotado';
 
 require_once __DIR__ . '/../includes/sport-images.php';
 require_once __DIR__ . '/../includes/size-guide.php';
@@ -32,9 +28,9 @@ require_once __DIR__ . '/../includes/size-guide.php';
 $guiaTallas = deportivo_guia_tallas($producto['categoria_slug'] ?? 'camisetas');
 $productoPrincipal = $producto;
 $imagenProductoUrl = Producto::urlImagen($producto['imagen_principal'], true);
-$mensajeStock = $tieneColores
-    ? Producto::mensajeStockColor($stockColorDefault, $colorDefault['nombre'] ?? '')
-    : Producto::mensajeStock($producto['stock_estado']);
+$galeria = Producto::galeriaParaFicha($producto);
+$tieneGaleria = count($galeria) > 1;
+$mensajeStock = Producto::mensajeStock($producto['stock_estado']);
 
 $navInViews = true;
 $cartBasePath = $assetBase;
@@ -57,31 +53,21 @@ $cartUrl = 'carrito_compras.php';
     <?php $defaultCategoriaId = (int) $producto['categoria_id']; include dirname(__DIR__, 2) . '/administrador/includes/admin-panel.php'; ?>
     <main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
-            <!-- Thumbnail Gallery (Desktop Left) -->
-            <?php if (!empty($producto['imagenes'])): ?>
-            <div class="hidden lg:flex lg:col-span-1 flex-col gap-4">
-                <?php foreach ($producto['imagenes'] as $index => $imagen): ?>
-                <img class="w-full aspect-[3/4] object-cover cursor-pointer hover:opacity-80 transition-opacity <?= $index === 0 ? 'border border-outline-variant' : '' ?>" data-alt="<?= htmlspecialchars($imagen['alt_text'] ?? $producto['nombre']) ?>"
-                    src="<?= htmlspecialchars($imagen['url']) ?>"
-                    <?= deportivo_admin_gallery_img((int) $imagen['id'], (int) $producto['id']) ?>
-                />
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
             <!-- Main Product Image -->
-            <div class="<?= !empty($producto['imagenes']) ? 'lg:col-span-6' : 'lg:col-span-7' ?> relative group overflow-hidden">
-                <img class="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-105" data-alt="<?= htmlspecialchars($producto['imagen_alt'] ?? $producto['nombre']) ?>"
-                    id="main-image" src="<?= htmlspecialchars(Producto::urlImagen($producto['imagen_principal'], true)) ?>"
+            <div class="lg:col-span-7 relative group overflow-hidden" data-product-gallery>
+                <img class="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-105 select-none"
+                    data-alt="<?= htmlspecialchars($producto['imagen_alt'] ?? $producto['nombre']) ?>"
+                    id="main-image"
+                    src="<?= htmlspecialchars($imagenProductoUrl) ?>"
                     <?= deportivo_admin_product_img((int) $producto['id']) ?>
                 />
-                <!-- Mobile Carousel Indicators -->
-                <?php if (!empty($producto['imagenes'])): ?>
-                <div class="flex lg:hidden justify-center gap-2 mt-4">
-                    <div class="w-2 h-2 rounded-full bg-secondary"></div>
-                    <?php for ($i = 1; $i < count($producto['imagenes']); $i++): ?>
-                    <div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-                    <?php endfor; ?>
-                </div>
+                <?php if ($tieneGaleria): ?>
+                <button type="button" class="product-gallery-arrow product-gallery-arrow--prev" data-gallery-prev aria-label="Imagen anterior">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button type="button" class="product-gallery-arrow product-gallery-arrow--next" data-gallery-next aria-label="Imagen siguiente">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
                 <?php endif; ?>
             </div>
             <!-- Product Details -->
@@ -126,9 +112,6 @@ $cartUrl = 'carrito_compras.php';
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <?php if ($tieneColores): ?>
-                    <?php $context = 'detail'; include __DIR__ . '/../includes/producto-color-selector.php'; ?>
-                    <?php endif; ?>
                     <div class="flex flex-col gap-4 mt-4">
                         <button type="button"
                             class="w-full bg-secondary text-on-secondary py-5 font-label-md uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98] text-center disabled:opacity-50 disabled:pointer-events-none"
@@ -138,10 +121,6 @@ $cartUrl = 'carrito_compras.php';
                             data-product-precio="<?= (float) $producto['precio'] ?>"
                             data-product-imagen="<?= htmlspecialchars($imagenProductoUrl, ENT_QUOTES) ?>"
                             data-product-talla="<?= htmlspecialchars($primeraTalla ?? 'M', ENT_QUOTES) ?>"
-                            data-product-color="<?= htmlspecialchars($colorDefault['nombre'] ?? '', ENT_QUOTES) ?>"
-                            data-product-color-slug="<?= htmlspecialchars($colorDefault['slug'] ?? '', ENT_QUOTES) ?>"
-                            data-product-color-id="<?= (int) ($colorDefault['id'] ?? 0) ?>"
-                            data-product-stock-cantidad="<?= $stockColorDefault ?>"
                             data-product-lavado="<?= htmlspecialchars($producto['lavado'] ?? '', ENT_QUOTES) ?>"
                             data-product-fit="<?= htmlspecialchars($producto['fit'] ?? '', ENT_QUOTES) ?>"
                             data-product-categoria="<?= htmlspecialchars($producto['categoria_nombre'] ?? '', ENT_QUOTES) ?>"
@@ -212,21 +191,54 @@ $cartUrl = 'carrito_compras.php';
     <?php include __DIR__ . '/../includes/size-guide-modal.php'; ?>
     <script>
         window.SIZE_GUIDE = <?= json_encode($guiaTallas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        window.PRODUCT_GALLERY = <?= json_encode(array_map(static function ($img) {
+            return [
+                'url' => Producto::urlImagen($img['url'], true),
+                'alt' => $img['alt_text'] ?? '',
+            ];
+        }, $galeria), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     </script>
     <script src="<?= htmlspecialchars($clienteJsPath) ?>size-guide.js"></script>
     <script>
-        const thumbnails = document.querySelectorAll('.lg\\:col-span-1 img[data-alt]');
-        const mainImage = document.getElementById('main-image');
+        (function () {
+            const gallery = window.PRODUCT_GALLERY || [];
+            const root = document.querySelector('[data-product-gallery]');
+            const mainImage = document.getElementById('main-image');
+            if (!root || !mainImage || gallery.length < 2) return;
 
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', (event) => {
-                if (thumb.hasAttribute('data-admin-gallery-image')) {
-                    return;
-                }
-                mainImage.src = thumb.src;
-                mainImage.setAttribute('data-alt', thumb.getAttribute('data-alt'));
+            let index = 0;
+            const btnPrev = root.querySelector('[data-gallery-prev]');
+            const btnNext = root.querySelector('[data-gallery-next]');
+
+            function show(i) {
+                index = (i + gallery.length) % gallery.length;
+                const item = gallery[index];
+                mainImage.src = item.url;
+                mainImage.setAttribute('data-alt', item.alt || '');
+                mainImage.alt = item.alt || '';
+            }
+
+            btnPrev?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                show(index - 1);
             });
-        });
+            btnNext?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                show(index + 1);
+            });
+
+            let touchStartX = 0;
+            root.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0]?.clientX || 0;
+            }, { passive: true });
+            root.addEventListener('touchend', (e) => {
+                const dx = (e.changedTouches[0]?.clientX || 0) - touchStartX;
+                if (Math.abs(dx) < 40) return;
+                show(index + (dx < 0 ? 1 : -1));
+            }, { passive: true });
+        })();
 
         const sizeButtons = document.querySelectorAll('#size-selector button');
         sizeButtons.forEach(btn => {

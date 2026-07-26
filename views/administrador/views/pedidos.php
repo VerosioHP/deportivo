@@ -62,6 +62,7 @@ $clienteIncludes = dirname(__DIR__, 2) . '/cliente/includes';
                         <th>Email</th>
                         <th>Total</th>
                         <th>Estado</th>
+                        <th>Pago</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -106,11 +107,19 @@ $clienteIncludes = dirname(__DIR__, 2) . '/cliente/includes';
         </div>
     </div>
 
+    <div id="comprobante-lightbox" class="pago-comprobante-lightbox hidden" hidden>
+        <button type="button" class="pago-comprobante-lightbox-cerrar" id="comprobante-lightbox-cerrar" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <img src="" alt="Comprobante ampliado" id="comprobante-lightbox-img" />
+    </div>
+
     <?php include $clienteIncludes . '/site-footer.php'; ?>
 
     <script>
         window.PEDIDOS_CONFIG = {
-            apiUrl: <?= json_encode($pedidosApiUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+            apiUrl: <?= json_encode($pedidosApiUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>,
+            uploadsBasePath: <?= json_encode($uploadsBasePath, JSON_UNESCAPED_SLASHES) ?>
         };
     </script>
     <script src="<?= htmlspecialchars($adminJsPath) ?>admin-pedidos.js"></script>

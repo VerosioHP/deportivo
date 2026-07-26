@@ -6,21 +6,19 @@ if (!defined('MAJESTIC_AUTH_LOADED')) {
 
 $homeUrl = $clienteHomeUrl ?? deportivo_cliente_url('../index.php');
 $catalogoCamisetas = deportivo_cliente_url('catalogo.php?categoria=camisetas');
-$catalogoPantalonetas = deportivo_cliente_url('catalogo.php?categoria=pantalonetas');
 $favoritosUrl = deportivo_cliente_url('favoritos.php');
 $loginUrl = deportivo_cliente_url('login.php');
 ?>
 <footer class="w-full bg-surface-container-low dark:bg-tertiary-container border-t border-outline-variant">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop px-margin-mobile md:px-margin-desktop py-16 max-w-container-max-width mx-auto">
         <div>
-            <a class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed mb-6 block hover:opacity-80 transition-opacity no-underline uppercase tracking-widest" href="<?= htmlspecialchars($homeUrl) ?>">DEPORTIVO<span class="text-secondary">.</span></a>
-            <p class="font-body-md text-body-md text-on-surface-variant max-w-xs">Ropa deportiva para todos los deportes. Camisetas y pantalonetas que rinden cuando tú rindes.</p>
+            <?php include __DIR__ . '/brand-logo.php'; ?>
+            <p class="font-body-md text-body-md text-on-surface-variant max-w-xs mt-6">Camisetas deportivas técnicas para entrenar y competir. Calidad Dry-Fit, tallas y colores con stock real.</p>
         </div>
         <div class="grid grid-cols-2 gap-8">
             <div class="flex flex-col gap-3">
                 <h4 class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Tienda</h4>
                 <a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors no-underline" href="<?= htmlspecialchars($catalogoCamisetas) ?>">Camisetas</a>
-                <a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors no-underline" href="<?= htmlspecialchars($catalogoPantalonetas) ?>">Pantalonetas</a>
                 <a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors no-underline" href="<?= htmlspecialchars($catalogoCamisetas) ?>">Catálogo</a>
                 <a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors no-underline" href="<?= htmlspecialchars($favoritosUrl) ?>">Favoritos</a>
             </div>
@@ -37,7 +35,7 @@ $loginUrl = deportivo_cliente_url('login.php');
                 <a class="hover:text-secondary transition-colors" href="#"><span class="material-symbols-outlined">sports_martial_arts</span></a>
                 <a class="hover:text-secondary transition-colors" href="#"><span class="material-symbols-outlined">mail</span></a>
             </div>
-            <p class="font-label-sm text-label-sm text-on-surface-variant opacity-50">© 2026 DEPORTIVO</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant opacity-50">© 2026 VEMA</p>
         </div>
     </div>
 </footer>

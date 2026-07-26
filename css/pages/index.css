@@ -1,86 +1,76 @@
-.hero-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    min-height: calc(100vh - 73px);
-}
-
-@media (min-width: 1024px) {
-    .hero-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-.hero-visual {
+.hero-cover {
     position: relative;
-    min-height: 420px;
+    width: 100%;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
     overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    background: #0a0a0a;
 }
 
-.hero-img-main {
+.hero-cover-bg {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: heroKenBurns 18s ease-in-out infinite alternate;
+    object-position: center center;
+    filter: brightness(0.6) contrast(1.05) saturate(0.9);
 }
 
-@keyframes heroKenBurns {
-    from { transform: scale(1); }
-    to   { transform: scale(1.08); }
-}
-
-.hero-img-stack {
+.hero-cover-shade {
     position: absolute;
-    bottom: 2rem;
-    right: 2rem;
-    display: flex;
-    gap: 0.75rem;
-    z-index: 10;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.18) 100%);
 }
 
-.hero-img-stack img {
-    width: 72px;
-    height: 96px;
-    object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25);
-    transition: transform .3s ease, width .3s ease, height .3s ease;
-}
-
-.hero-img-stack img:hover {
-    transform: translateY(-6px) scale(1.05);
-    width: 88px;
-    height: 116px;
+.hero-cover-layout {
+    position: relative;
     z-index: 2;
+    width: 100%;
+    max-width: var(--spacing-container-max, 1440px);
+    margin-inline: auto;
+    padding-block: 3.5rem 4rem;
 }
 
-.hero-accent-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 0;
-    background: var(--color-accent);
-    animation: lineGrow 1s ease .4s forwards;
+.hero-cover-content {
+    color: #fff;
 }
 
-@keyframes lineGrow {
-    to { height: 100%; }
+.hero-cover-content h1 {
+    color: #fff;
 }
 
-.hero-stat {
-    border-left: 2px solid var(--color-accent);
-    padding-left: 1rem;
+@media (min-width: 1024px) {
+    .hero-cover {
+        min-height: calc(100vh - 60px);
+        min-height: calc(100dvh - 60px);
+    }
+
+    .hero-cover-bg {
+        object-position: center 35%;
+    }
+
+    .hero-cover-layout {
+        padding-block: 4.5rem 5rem;
+    }
 }
 
 @media (max-width: 767px) {
-    .hero-img-stack {
-        bottom: 1rem;
-        right: 1rem;
+    .hero-cover {
+        min-height: calc(100vh - 52px);
+        min-height: calc(100dvh - 52px);
     }
-    .hero-img-stack img {
-        width: 56px;
-        height: 72px;
+
+    .hero-cover-bg {
+        object-position: 62% center;
+    }
+
+    .hero-cover-layout {
+        padding-block: 2.5rem 3rem;
     }
 }

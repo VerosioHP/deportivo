@@ -101,12 +101,8 @@ class Producto
     {
         $id = (int) $producto['id'];
         $producto['tallas'] = self::obtenerTallas($id);
-        $producto['colores'] = self::obtenerColores($id);
-
-        if (!empty($producto['colores'])) {
-            $total = self::stockTotalColores($producto['colores']);
-            $producto['stock_estado'] = self::calcularStockEstado($total);
-        }
+        $producto['colores'] = [];
+        $producto['imagenes'] = self::obtenerImagenes($id);
     }
 
     public static function obtenerTallas(int $productoId): array
@@ -594,6 +590,52 @@ class Producto
         return true;
     }
 
+    public static function reponerStockPorNombre(int $productoId, string $colorNombre, int $cantidad): bool
+    {
+        global $conexion;
+
+        if ($productoId <= 0 || $cantidad <= 0) {
+            return false;
+        }
+
+        $colorNombre = trim($colorNombre);
+
+        if ($colorNombre !== '') {
+            $stmt = $conexion->prepare(
+                'SELECT id, stock_cantidad FROM producto_colores
+                 WHERE producto_id = :producto_id AND LOWER(nombre) = LOWER(:nombre)
+                 LIMIT 1'
+            );
+            $stmt->execute([
+                ':producto_id' => $productoId,
+                ':nombre' => $colorNombre,
+            ]);
+            $color = $stmt->fetch();
+
+            if ($color) {
+                $nueva = (int) $color['stock_cantidad'] + $cantidad;
+                $conexion->prepare('UPDATE producto_colores SET stock_cantidad = :c WHERE id = :id')
+                    ->execute([':c' => $nueva, ':id' => (int) $color['id']]);
+                self::recalcularStockProducto($productoId);
+
+                return true;
+            }
+        }
+
+        $colores = self::obtenerColores($productoId);
+        if (count($colores) === 1) {
+            $color = $colores[0];
+            $nueva = (int) $color['stock_cantidad'] + $cantidad;
+            $conexion->prepare('UPDATE producto_colores SET stock_cantidad = :c WHERE id = :id')
+                ->execute([':c' => $nueva, ':id' => (int) $color['id']]);
+            self::recalcularStockProducto($productoId);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private static function generarSlugUnico(string $nombre, ?int $excluirId = null): string
     {
         global $conexion;
@@ -684,5 +726,105 @@ class Producto
         $row = $stmt->fetch();
 
         return $row ?: null;
+    }
+
+    public static function siguienteOrdenGaleria(int $productoId): int
+    {
+        global $conexion;
+
+        $stmt = $conexion->prepare(
+            'SELECT COALESCE(MAX(orden), -1) FROM producto_imagenes WHERE producto_id = :producto_id'
+        );
+        $stmt->execute([':producto_id' => $productoId]);
+
+        return ((int) $stmt->fetchColumn()) + 1;
+    }
+
+    public static function agregarImagenes(int $productoId, array $paths, ?string $altText = null): int
+    {
+        global $conexion;
+
+        $paths = array_values(array_filter(array_map('trim', $paths), static fn ($p) => $p !== ''));
+
+        if ($productoId <= 0 || empty($paths)) {
+            return 0;
+        }
+
+        $orden = self::siguienteOrdenGaleria($productoId);
+        $stmt = $conexion->prepare(
+            'INSERT INTO producto_imagenes (producto_id, url, alt_text, orden)
+             VALUES (:producto_id, :url, :alt_text, :orden)'
+        );
+
+        $agregadas = 0;
+
+        foreach ($paths as $path) {
+            $stmt->execute([
+                ':producto_id' => $productoId,
+                ':url' => $path,
+                ':alt_text' => $altText,
+                ':orden' => $orden,
+            ]);
+            $orden++;
+            $agregadas++;
+        }
+
+        return $agregadas;
+    }
+
+    public static function eliminarImagenes(int $productoId, array $imagenIds): int
+    {
+        global $conexion;
+
+        $imagenIds = array_values(array_unique(array_filter(
+            array_map('intval', $imagenIds),
+            static fn ($id) => $id > 0
+        )));
+
+        if ($productoId <= 0 || empty($imagenIds)) {
+            return 0;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($imagenIds), '?'));
+        $sql = "DELETE FROM producto_imagenes WHERE producto_id = ? AND id IN ({$placeholders})";
+        $stmt = $conexion->prepare($sql);
+        $params = array_merge([$productoId], $imagenIds);
+        $stmt->execute($params);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Galería para la ficha: imagen principal + tomas adicionales.
+     */
+    public static function galeriaParaFicha(array $producto): array
+    {
+        $galeria = [];
+        $principal = trim((string) ($producto['imagen_principal'] ?? ''));
+
+        if ($principal !== '') {
+            $galeria[] = [
+                'id' => 0,
+                'url' => $principal,
+                'alt_text' => $producto['imagen_alt'] ?? ($producto['nombre'] ?? 'Producto'),
+                'es_principal' => true,
+            ];
+        }
+
+        foreach ($producto['imagenes'] ?? [] as $imagen) {
+            $url = trim((string) ($imagen['url'] ?? ''));
+            if ($url === '' || $url === $principal) {
+                continue;
+            }
+
+            $galeria[] = [
+                'id' => (int) ($imagen['id'] ?? 0),
+                'url' => $url,
+                'alt_text' => $imagen['alt_text'] ?? ($producto['nombre'] ?? 'Producto'),
+                'es_principal' => false,
+            ];
+        }
+
+        return $galeria;
     }
 }

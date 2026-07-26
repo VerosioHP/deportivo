@@ -26,7 +26,7 @@ $facturaUrl = '../controllers/facturaController.php?id=' . (int) $pedido['id'];
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Pedido confirmado | DEPORTIVO</title>
+    <title>Pedido pendiente | DEPORTIVO</title>
     <?php include __DIR__ . '/../includes/design-head.php'; ?>
 </head>
 
@@ -35,10 +35,10 @@ $facturaUrl = '../controllers/facturaController.php?id=' . (int) $pedido['id'];
 
     <main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-20 text-center">
         <div class="max-w-xl mx-auto">
-            <span class="material-symbols-outlined text-5xl text-secondary mb-6">check_circle</span>
-            <h1 class="font-display-lg text-display-lg text-primary dark:text-primary-fixed mb-4 uppercase">¡Pedido confirmado!</h1>
-            <p class="font-body-lg text-on-surface-variant mb-2">Gracias, <?= htmlspecialchars($pedido['nombre']) ?>. Hemos recibido tu pedido <strong>#<?= htmlspecialchars(Pedido::numeroPublico($pedido)) ?></strong>.</p>
-            <p class="font-body-md text-on-surface-variant mb-10">Te enviamos un correo a <strong><?= htmlspecialchars($pedido['email']) ?></strong> con los detalles. La tienda también fue notificada por email. Tu compra llegará a:</p>
+            <span class="material-symbols-outlined text-5xl text-secondary mb-6">schedule</span>
+            <h1 class="font-display-lg text-display-lg text-primary dark:text-primary-fixed mb-4 uppercase">Pedido pendiente</h1>
+            <p class="font-body-lg text-on-surface-variant mb-2">Gracias, <?= htmlspecialchars($pedido['nombre']) ?>. Recibimos tu pedido <strong><?= htmlspecialchars(Pedido::numeroPublico($pedido)) ?></strong> y quedó <strong>pendiente</strong> de revisión.</p>
+            <p class="font-body-md text-on-surface-variant mb-10">Te enviamos un correo a <strong><?= htmlspecialchars($pedido['email']) ?></strong> con los detalles. Cuando la tienda confirme tu pedido, te avisaremos. Tu compra llegará a:</p>
 
             <div class="text-left bg-surface-container-low dark:bg-tertiary-container p-8 mb-10 border border-outline-variant">
                 <p class="font-label-sm uppercase tracking-widest text-on-surface-variant mb-4">Dirección de envío</p>
@@ -46,10 +46,13 @@ $facturaUrl = '../controllers/facturaController.php?id=' . (int) $pedido['id'];
                 <p class="font-body-md text-on-surface-variant"><?= htmlspecialchars($pedido['direccion']) ?></p>
                 <p class="font-body-md text-on-surface-variant"><?= htmlspecialchars($pedido['codigo_postal'] . ' ' . $pedido['ciudad'] . ', ' . $pedido['provincia']) ?></p>
                 <p class="font-body-md text-on-surface-variant mt-2"><?= htmlspecialchars($pedido['telefono']) ?></p>
+                <?php if (!empty($pedido['metodo_pago'])): ?>
+                <p class="font-body-md text-on-surface-variant mt-4"><strong>Pago:</strong> <?= htmlspecialchars(Pedido::etiquetaMetodoPago($pedido['metodo_pago'])) ?></p>
+                <?php endif; ?>
             </div>
 
             <p class="font-headline-sm text-headline-sm text-primary mb-2">Total: <?= deportivo_formatear_precio((float) $pedido['total']) ?></p>
-            <p class="font-body-md text-on-surface-variant mb-8">Te contactaremos pronto para confirmar disponibilidad y coordinar el envío.</p>
+            <p class="font-body-md text-on-surface-variant mb-8">Nuestro equipo revisará tu pedido y actualizará el estado. Te contactaremos para coordinar el envío.</p>
 
             <div class="bg-surface-container-low dark:bg-tertiary-container border border-outline-variant p-6 mb-10 text-left">
                 <p class="font-label-sm uppercase tracking-widest text-on-surface-variant mb-2">Tu factura</p>

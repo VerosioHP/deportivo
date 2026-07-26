@@ -8,7 +8,8 @@ require_once dirname(__DIR__, 3) . '/models/SitioImagen.php';
 function deportivo_img(string $key, string $size = 'lg', bool $desdeVistas = false): string
 {
     static $images = [
-        'hero_main'           => 'photo-1476480862126-209bfaa8edc8',
+        'hero_main'           => 'photo-1635864547980-4c818b210101',
+        'hero_street'         => 'photo-1635864547980-4c818b210101',
         'running'             => 'photo-1476480862126-209bfaa8edc8',
         'gym'                 => 'photo-1571019614242-c5c5dee9f50b',
         'cycling'             => 'photo-1461896836934-ffe607ba8211',
@@ -42,13 +43,16 @@ function deportivo_img(string $key, string $size = 'lg', bool $desdeVistas = fal
 
 function deportivo_sport_cards(): array
 {
+    return deportivo_camiseta_features();
+}
+
+function deportivo_camiseta_features(): array
+{
     return [
-        ['num' => '01', 'name' => 'Running',  'key' => 'running',    'alt' => 'Corredor en carretera al amanecer'],
-        ['num' => '02', 'name' => 'Gym',      'key' => 'gym',        'alt' => 'Entrenamiento de fuerza en gimnasio'],
-        ['num' => '03', 'name' => 'Básquet',  'key' => 'basketball', 'alt' => 'Jugador de baloncesto en cancha'],
-        ['num' => '04', 'name' => 'Tenis',    'key' => 'tennis',     'alt' => 'Jugador de tenis en pista'],
-        ['num' => '05', 'name' => 'Ciclismo', 'key' => 'cycling',    'alt' => 'Ciclistas en carretera'],
-        ['num' => '06', 'name' => 'Yoga',     'key' => 'yoga',       'alt' => 'Persona practicando yoga'],
+        ['num' => '01', 'name' => 'Dry-Fit',     'key' => 'camisetas',  'alt' => 'Camiseta deportiva Dry-Fit'],
+        ['num' => '02', 'name' => 'Corte atlético','key' => 'gym',       'alt' => 'Camiseta con corte atlético'],
+        ['num' => '03', 'name' => 'Colores',      'key' => 'catalogo_camisetas', 'alt' => 'Camisetas en varios colores'],
+        ['num' => '04', 'name' => 'Comodidad',    'key' => 'crossfit',   'alt' => 'Camiseta cómoda para entrenar'],
     ];
 }
 

@@ -47,32 +47,36 @@ $adminApiUrl = $adminControllersPath . 'productoController.php';
                 </div>
                 <div class="md:col-span-2 space-y-4">
                     <label class="block font-label-md text-label-md text-on-surface-variant" for="admin-imagen-archivo">Imagen principal *</label>
+                    <input type="hidden" id="admin-imagen-actual" name="imagen_actual" value="" />
                     <div class="flex flex-col sm:flex-row gap-4 items-start">
-                        <img id="admin-imagen-preview" src="" alt="Vista previa" class="hidden w-28 aspect-[3/4] object-cover border border-outline-variant bg-surface-container" />
+                        <img id="admin-imagen-preview" src="" alt="Vista previa" class="hidden w-16 aspect-[3/4] object-cover border border-outline-variant bg-surface-container shrink-0" />
                         <div class="flex-1 w-full space-y-4">
                             <div>
                                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-imagen-archivo">Subir desde tu PC</label>
                                 <input class="block w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-primary file:text-on-primary file:font-label-sm file:uppercase file:tracking-widest hover:file:bg-secondary hover:file:text-on-secondary file:cursor-pointer" id="admin-imagen-archivo" name="imagen_archivo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
-                                <p class="mt-2 font-body-md text-body-md text-on-surface-variant">JPG, PNG, WEBP o GIF. Máximo 5 MB.</p>
+                                <p class="mt-2 font-body-md text-body-md text-on-surface-variant">JPG, PNG, WEBP o GIF. Máximo 5 MB. Al editar, deja este campo vacío para conservar la imagen actual.</p>
                             </div>
                             <div>
-                                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-imagen">O pegar URL externa</label>
-                                <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="admin-imagen" name="imagen_principal" type="url" placeholder="https://..." />
+                                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-imagen">O pegar URL externa (opcional)</label>
+                                <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="admin-imagen" name="imagen_principal" type="text" placeholder="https://..." autocomplete="off" />
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="md:col-span-2 space-y-4">
+                    <label class="block font-label-md text-label-md text-on-surface-variant" for="admin-galeria-archivos">Más tomas del producto</label>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Agrega fotos de frente, espalda, costados u otros ángulos. Puedes elegir varias a la vez o ir sumando de una en una. El cliente podrá pasarlas en la ficha y en el catálogo.</p>
+                    <div id="admin-galeria-existente" class="flex flex-wrap gap-3"></div>
+                    <div>
+                        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-galeria-archivos">Subir imágenes adicionales</label>
+                        <input class="block w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-primary file:text-on-primary file:font-label-sm file:uppercase file:tracking-widest hover:file:bg-secondary hover:file:text-on-secondary file:cursor-pointer" id="admin-galeria-archivos" name="galeria_archivos[]" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple />
+                    </div>
+                    <div id="admin-galeria-nuevas" class="flex flex-wrap gap-3"></div>
+                    <div id="admin-galeria-eliminar"></div>
+                </div>
                 <div>
                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="admin-tallas">Tallas (separadas por coma) *</label>
                     <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:ring-0 font-body-md" id="admin-tallas" name="tallas" type="text" placeholder="S, M, L, XL" required />
-                </div>
-                <div class="md:col-span-2">
-                    <div class="flex items-center justify-between mb-3">
-                        <label class="block font-label-md text-label-md text-on-surface-variant">Colores y stock *</label>
-                        <button type="button" id="admin-add-color" class="font-label-sm text-label-sm uppercase tracking-widest text-secondary hover:underline">+ Añadir color</button>
-                    </div>
-                    <p class="font-body-md text-body-md text-on-surface-variant mb-4">Usa una sola imagen con todas las variantes. Aquí defines el nombre del color y cuántas unidades hay de cada uno.</p>
-                    <div id="admin-colores-list" class="space-y-3"></div>
                 </div>
                 <div>
                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="admin-lavado">Lavado</label>

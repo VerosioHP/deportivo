@@ -29,14 +29,14 @@ $navClass = static function (string $page) use ($activePage): string {
     return "$base $idle";
 };
 ?>
-<nav class="w-full top-0 sticky bg-surface/95 dark:bg-on-background/95 backdrop-blur-md border-b border-outline-variant dark:border-outline z-50">
-    <div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max-width mx-auto">
-        <a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed no-underline hover:opacity-80 transition-opacity tracking-widest uppercase" href="<?= htmlspecialchars($homeUrl) ?>">DEPORTIVO<span class="text-secondary">.</span></a>
+<nav class="site-nav w-full top-0 sticky bg-surface/95 dark:bg-on-background/95 backdrop-blur-md border-b border-outline-variant dark:border-outline z-50">
+    <div class="site-nav-inner flex justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+        <?php include __DIR__ . '/brand-logo.php'; ?>
         <div class="hidden md:flex gap-8">
             <a class="<?= $navClass('catalogo') ?>" href="<?= htmlspecialchars($catalogoUrl) ?>">Catálogo</a>
             <a class="<?= $navClass('nosotros') ?>" href="<?= htmlspecialchars($nosotrosUrl) ?>">Nosotros</a>
         </div>
-        <div class="flex items-center gap-5 text-primary dark:text-primary-fixed">
+        <div class="site-nav-actions flex items-center gap-4 text-primary dark:text-primary-fixed">
             <?php if (empty($esAdmin)) : ?>
             <button type="button" class="transition-opacity active:opacity-70 hidden sm:block"><span class="material-symbols-outlined">search</span></button>
             <?php include __DIR__ . '/favorites-widget.php'; ?>

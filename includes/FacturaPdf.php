@@ -222,7 +222,7 @@ class FacturaPdf
 <body>
     <div class="header">
         <div class="brand">DEPORTIVO<span>.</span></div>
-        <div class="meta">Factura de pedido #{$numeroPedido} · {$fecha} · Estado: {$estado}</div>
+        <div class="meta">Factura de pedido {$numeroPedido} · {$fecha} · Estado: {$estado}</div>
     </div>
 
     <table class="grid">

@@ -70,8 +70,9 @@
 }
 
 .admin-image-modal-preview {
-    max-height: 280px;
-    object-fit: contain;
+    width: 4.5rem;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
     background: var(--color-surface-container);
 }
 

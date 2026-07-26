@@ -16,7 +16,7 @@ class MailPedido
         }
 
         $numeroPedido = Pedido::numeroPublico($pedido);
-        $asunto = "Nuevo pedido #{$numeroPedido} — DEPORTIVO";
+        $asunto = "Nuevo pedido {$numeroPedido} — DEPORTIVO";
         $html = self::construirHtmlAdmin($pedido);
         $texto = self::construirTextoAdmin($pedido);
 
@@ -33,7 +33,7 @@ class MailPedido
         }
 
         $numeroPedido = Pedido::numeroPublico($pedido);
-        $asunto = "Tu pedido #{$numeroPedido} fue recibido — DEPORTIVO";
+        $asunto = "Tu pedido {$numeroPedido} fue recibido — DEPORTIVO";
         $html = self::construirHtmlCliente($pedido);
         $texto = self::construirTextoCliente($pedido);
 
@@ -50,7 +50,7 @@ class MailPedido
         }
 
         $numeroPedido = Pedido::numeroPublico($pedido);
-        $asunto = "Tu pedido #{$numeroPedido} va en camino — DEPORTIVO";
+        $asunto = "Tu pedido {$numeroPedido} va en camino — DEPORTIVO";
         $html = self::construirHtmlEnCamino($pedido);
         $texto = self::construirTextoEnCamino($pedido);
 
@@ -104,7 +104,7 @@ HTML;
 <html lang="es">
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
-    <h2 style="color: #c9a227;">Nuevo pedido #{$numeroPedido}</h2>
+    <h2 style="color: #c9a227;">Nuevo pedido {$numeroPedido}</h2>
     <p>Se ha registrado un nuevo pedido en la tienda.</p>
 
     <h3>Cliente</h3>
@@ -158,7 +158,7 @@ HTML;
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
     <h2 style="color: #c9a227;">¡Gracias por tu pedido, {$nombre}!</h2>
-    <p>Hemos recibido tu pedido <strong>#{$numeroPedido}</strong>. Te contactaremos pronto para confirmar disponibilidad y envío.</p>
+    <p>Hemos recibido tu pedido <strong>{$numeroPedido}</strong>. Te contactaremos pronto para confirmar disponibilidad y envío.</p>
 
     <h3>Dirección de envío</h3>
     <p>
@@ -203,7 +203,7 @@ HTML;
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Arial, sans-serif; color: #1a1a1a; line-height: 1.5;">
     <h2 style="color: #c9a227;">¡Tu pedido va en camino, {$nombre}!</h2>
-    <p>Tu pedido <strong>#{$numeroPedido}</strong> ya fue despachado y está en ruta hacia tu dirección.</p>
+    <p>Tu pedido <strong>{$numeroPedido}</strong> ya fue despachado y está en ruta hacia tu dirección.</p>
 
     <h3>Dirección de entrega</h3>
     <p>
@@ -235,7 +235,7 @@ HTML;
     private static function construirTextoEnCamino(array $pedido): string
     {
         $lineas = [];
-        $lineas[] = 'PEDIDO EN CAMINO #' . Pedido::numeroPublico($pedido);
+        $lineas[] = 'PEDIDO EN CAMINO ' . Pedido::numeroPublico($pedido);
         $lineas[] = '';
         $lineas[] = "Hola {$pedido['nombre']},";
         $lineas[] = 'Tu pedido ya fue despachado y va en camino hacia:';
@@ -297,7 +297,7 @@ HTML;
     private static function construirTextoPedido(array $pedido, string $titulo): string
     {
         $lineas = [];
-        $lineas[] = "{$titulo} #" . Pedido::numeroPublico($pedido);
+        $lineas[] = "{$titulo} " . Pedido::numeroPublico($pedido);
         $lineas[] = '';
         $lineas[] = 'Cliente: ' . $pedido['nombre'] . ' ' . $pedido['apellido'];
         $lineas[] = 'Email: ' . $pedido['email'];

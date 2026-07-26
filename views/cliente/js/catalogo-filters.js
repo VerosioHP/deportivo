@@ -205,6 +205,59 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
     }
 
+    function parseGalleryUrls(raw) {
+        if (!raw) return [];
+        try {
+            const urls = JSON.parse(raw);
+            return Array.isArray(urls) ? urls.filter(Boolean) : [];
+        } catch (_) {
+            return [];
+        }
+    }
+
+    function initCardGalleries() {
+        document.querySelectorAll('[data-card-gallery]').forEach((root) => {
+            const urls = parseGalleryUrls(root.getAttribute('data-gallery-urls'));
+            const img = root.querySelector('[data-card-gallery-img]');
+            if (!img || urls.length < 2) return;
+
+            let index = 0;
+            let swiped = false;
+            const show = (i) => {
+                index = (i + urls.length) % urls.length;
+                img.src = urls[index];
+            };
+
+            root.querySelector('[data-card-gallery-prev]')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                show(index - 1);
+            });
+            root.querySelector('[data-card-gallery-next]')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                show(index + 1);
+            });
+
+            let touchStartX = 0;
+            root.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0]?.clientX || 0;
+                swiped = false;
+            }, { passive: true });
+            root.addEventListener('touchend', (e) => {
+                const dx = (e.changedTouches[0]?.clientX || 0) - touchStartX;
+                if (Math.abs(dx) < 40) return;
+                swiped = true;
+                show(index + (dx < 0 ? 1 : -1));
+            }, { passive: true });
+            root.querySelector('a.admin-product-link')?.addEventListener('click', (e) => {
+                if (!swiped) return;
+                e.preventDefault();
+                swiped = false;
+            });
+        });
+    }
+
     document.getElementById('reset-filters')?.addEventListener('click', resetFilters);
 
     initCardSizeSelectors();
@@ -215,4 +268,5 @@
     initCheckboxFilters('[data-filter-fit]', filters.fits);
     initCheckboxVisuals();
     initCategoryDropdown();
+    initCardGalleries();
 })();

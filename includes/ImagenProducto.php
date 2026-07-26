@@ -5,6 +5,7 @@ class ImagenProducto
     private const UPLOAD_DIRS = [
         'productos' => __DIR__ . '/../uploads/productos',
         'sitio' => __DIR__ . '/../uploads/sitio',
+        'comprobantes' => __DIR__ . '/../uploads/comprobantes',
     ];
     private const MAX_BYTES = 5242880;
     private const ALLOWED_MIMES = [
@@ -34,8 +35,16 @@ class ImagenProducto
         }
 
         $uploadDir = self::UPLOAD_DIRS[$tipo] ?? self::UPLOAD_DIRS['productos'];
-        $prefix = $tipo === 'sitio' ? 'sitio_' : 'prod_';
-        $folder = $tipo === 'sitio' ? 'uploads/sitio' : 'uploads/productos';
+        $prefix = match ($tipo) {
+            'sitio' => 'sitio_',
+            'comprobantes' => 'comp_',
+            default => 'prod_',
+        };
+        $folder = match ($tipo) {
+            'sitio' => 'uploads/sitio',
+            'comprobantes' => 'uploads/comprobantes',
+            default => 'uploads/productos',
+        };
 
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
             return ['ok' => false, 'error' => 'No se pudo crear la carpeta de subidas.'];

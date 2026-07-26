@@ -3,7 +3,6 @@
 session_start();
 
 require_once dirname(__DIR__, 3) . '/models/Pedido.php';
-require_once dirname(__DIR__, 3) . '/includes/MailPedido.php';
 require_once dirname(__DIR__, 3) . '/config/moneda.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -58,13 +57,7 @@ try {
     exit;
 }
 
-try {
-    MailPedido::notificarPedidoNuevo($pedidoId);
-} catch (Throwable $e) {
-    // El pedido ya está guardado; no bloquear si falla el correo.
-}
-
 $_SESSION['ultimo_pedido_id'] = $pedidoId;
 
-header('Location: ../views/checkout_exito.php?id=' . $pedidoId);
+header('Location: ../views/checkout_pago.php?id=' . $pedidoId);
 exit;

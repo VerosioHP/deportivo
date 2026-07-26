@@ -1,37 +1,37 @@
 /**
- * Kinetic Noir — Design tokens
- * Fuente: css/DESIGN.md
+ * VEMA — Design tokens
+ * Paleta monocromática: negro, blanco y grises.
  */
 :root {
-    /* Accent — Electric Volt */
-    --color-accent: #DFFF00;
-    --color-accent-on: #0D0D0E;
-    --color-accent-dim: #5C6200;
-    --color-accent-container: #E8FFB3;
-    --color-accent-container-on: #2A2D00;
+    /* Accent — blanco/negro (sin color extra) */
+    --color-accent: #000000;
+    --color-accent-on: #FFFFFF;
+    --color-accent-dim: #000000;
+    --color-accent-container: #E8E8E8;
+    --color-accent-container-on: #000000;
 
     /* Light mode surfaces */
-    --color-background: #F4F4F6;
+    --color-background: #FFFFFF;
     --color-surface: #FFFFFF;
-    --color-surface-dim: #E8E8EC;
+    --color-surface-dim: #F2F2F2;
     --color-surface-container-lowest: #FFFFFF;
-    --color-surface-container-low: #F4F4F6;
-    --color-surface-container: #E8E8EC;
-    --color-surface-container-high: #DCDCE2;
-    --color-surface-container-highest: #CFCFD6;
+    --color-surface-container-low: #F5F5F5;
+    --color-surface-container: #EBEBEB;
+    --color-surface-container-high: #E0E0E0;
+    --color-surface-container-highest: #D4D4D4;
 
     /* Light mode content */
-    --color-on-background: #12131A;
-    --color-on-surface: #12131A;
-    --color-on-surface-variant: #46464A;
-    --color-outline: #919094;
-    --color-outline-variant: #C7C6CA;
+    --color-on-background: #000000;
+    --color-on-surface: #000000;
+    --color-on-surface-variant: #4A4A4A;
+    --color-outline: #8A8A8A;
+    --color-outline-variant: #C8C8C8;
 
     /* Primary (text / UI chrome) */
-    --color-primary: #12131A;
-    --color-on-primary: #F4F4F6;
-    --color-primary-container: #E8E8EC;
-    --color-on-primary-container: #12131A;
+    --color-primary: #000000;
+    --color-on-primary: #FFFFFF;
+    --color-primary-container: #EBEBEB;
+    --color-on-primary-container: #000000;
 
     /* Error */
     --color-error: #BA1A1A;
@@ -51,28 +51,32 @@
 }
 
 html.dark {
-    /* Dark mode — Tech-Noir (DESIGN.md yaml) */
-    --color-background: #12131A;
-    --color-surface: #12131A;
-    --color-surface-dim: #12131A;
-    --color-surface-container-lowest: #0C0E14;
-    --color-surface-container-low: #1A1B22;
-    --color-surface-container: #1E1F26;
-    --color-surface-container-high: #282A31;
-    --color-surface-container-highest: #33343C;
+    /* Dark mode — negro puro / blanco */
+    --color-background: #000000;
+    --color-surface: #000000;
+    --color-surface-dim: #000000;
+    --color-surface-container-lowest: #000000;
+    --color-surface-container-low: #111111;
+    --color-surface-container: #1A1A1A;
+    --color-surface-container-high: #242424;
+    --color-surface-container-highest: #2E2E2E;
 
-    --color-on-background: #E2E1EB;
-    --color-on-surface: #E2E1EB;
-    --color-on-surface-variant: #C7C6CA;
-    --color-outline: #919094;
-    --color-outline-variant: #46464A;
+    --color-on-background: #FFFFFF;
+    --color-on-surface: #FFFFFF;
+    --color-on-surface-variant: #B3B3B3;
+    --color-outline: #8A8A8A;
+    --color-outline-variant: #3A3A3A;
 
-    --color-primary: #E2E1EB;
-    --color-on-primary: #0D0D0E;
-    --color-primary-container: #1E1F26;
-    --color-on-primary-container: #C7C6CA;
+    --color-primary: #FFFFFF;
+    --color-on-primary: #000000;
+    --color-primary-container: #1A1A1A;
+    --color-on-primary-container: #B3B3B3;
 
-    --color-accent-dim: #DFFF00;
+    --color-accent: #FFFFFF;
+    --color-accent-on: #000000;
+    --color-accent-dim: #FFFFFF;
+    --color-accent-container: #2E2E2E;
+    --color-accent-container-on: #FFFFFF;
 
     --color-error: #FFB4AB;
     --color-on-error: #690005;

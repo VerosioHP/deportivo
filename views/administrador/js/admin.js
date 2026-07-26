@@ -13,10 +13,17 @@
     const deleteBtn = document.getElementById('admin-delete-btn');
     const imagenInput = document.getElementById('admin-imagen-archivo');
     const imagenUrlInput = document.getElementById('admin-imagen');
+    const imagenActualInput = document.getElementById('admin-imagen-actual');
     const imagenPreview = document.getElementById('admin-imagen-preview');
-    const coloresList = document.getElementById('admin-colores-list');
+    const galeriaInput = document.getElementById('admin-galeria-archivos');
+    const galeriaExistente = document.getElementById('admin-galeria-existente');
+    const galeriaNuevas = document.getElementById('admin-galeria-nuevas');
+    const galeriaEliminar = document.getElementById('admin-galeria-eliminar');
     let categoriasCache = [];
     let previewObjectUrl = null;
+    const galeriaPreviewUrls = [];
+    let galeriaEliminarIds = [];
+    let galeriaFilesPendientes = [];
 
     function resolveImageSrc(path) {
         if (!path) return '';
@@ -25,38 +32,104 @@
         return `${config.uploadsBasePath || ''}${path.replace(/^\//, '')}`;
     }
 
+    function isExternalImage(path) {
+        return /^https?:\/\//i.test(path || '') || String(path || '').startsWith('//');
+    }
+
     function escapeAttr(v) {
         return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     }
 
-    function createColorRow(color = {}) {
-        const row = document.createElement('div');
-        row.className = 'admin-color-row grid grid-cols-1 sm:grid-cols-[1fr_120px_auto] gap-3 items-end border border-outline-variant p-3';
-        row.innerHTML = `
-            <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Color</label>
-                <input class="w-full py-2 bg-transparent border-0 border-b border-outline-variant focus:border-secondary font-body-md" name="colores_nombre[]" type="text" placeholder="Blanco, Negro, Gris..." value="${escapeAttr(color.nombre || '')}" required />
-            </div>
-            <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Stock</label>
-                <input class="w-full py-2 bg-transparent border-0 border-b border-outline-variant focus:border-secondary font-body-md" name="colores_stock[]" type="number" min="0" step="1" value="${escapeAttr(color.stock_cantidad ?? 0)}" required />
-            </div>
-            <button type="button" class="admin-remove-row text-error font-label-sm uppercase tracking-widest hover:underline pb-2">Quitar</button>
-        `;
-        row.querySelector('.admin-remove-row')?.addEventListener('click', () => {
-            if (coloresList.querySelectorAll('.admin-color-row').length <= 1) {
-                showError('Debe haber al menos un color.');
-                return;
-            }
-            row.remove();
-        });
-        return row;
+    function clearGaleriaPreviews() {
+        while (galeriaPreviewUrls.length) {
+            URL.revokeObjectURL(galeriaPreviewUrls.pop());
+        }
+        if (galeriaNuevas) galeriaNuevas.innerHTML = '';
+        if (galeriaInput) galeriaInput.value = '';
+        galeriaFilesPendientes = [];
+        syncGaleriaInputFiles();
     }
 
-    function renderColores(colores) {
-        if (!coloresList) return;
-        coloresList.innerHTML = '';
-        (colores?.length ? colores : [{}]).forEach((c) => coloresList.appendChild(createColorRow(c)));
+    function syncGaleriaInputFiles() {
+        if (!galeriaInput || typeof DataTransfer === 'undefined') return;
+        const dt = new DataTransfer();
+        galeriaFilesPendientes.forEach((file) => dt.items.add(file));
+        galeriaInput.files = dt.files;
+    }
+
+    function renderGaleriaEliminarInputs() {
+        if (!galeriaEliminar) return;
+        galeriaEliminar.innerHTML = galeriaEliminarIds
+            .map((id) => `<input type="hidden" name="galeria_eliminar[]" value="${escapeAttr(id)}" />`)
+            .join('');
+    }
+
+    function renderGaleriaExistente(imagenes) {
+        if (!galeriaExistente) return;
+        galeriaExistente.innerHTML = '';
+        galeriaEliminarIds = [];
+        renderGaleriaEliminarInputs();
+
+        (imagenes || []).forEach((img) => {
+            const id = Number(img.id || 0);
+            if (id <= 0) return;
+
+            const item = document.createElement('div');
+            item.className = 'admin-galeria-item relative';
+            item.dataset.imagenId = String(id);
+            item.innerHTML = `
+                <img src="${escapeAttr(resolveImageSrc(img.url))}" alt="Toma del producto" class="w-16 aspect-[3/4] object-cover border border-outline-variant bg-surface-container" />
+                <button type="button" class="admin-galeria-remove absolute top-1 right-1 bg-surface/90 text-error text-xs px-1.5 py-0.5 uppercase tracking-widest" title="Quitar">×</button>
+            `;
+            item.querySelector('.admin-galeria-remove')?.addEventListener('click', () => {
+                galeriaEliminarIds.push(id);
+                renderGaleriaEliminarInputs();
+                item.remove();
+            });
+            galeriaExistente.appendChild(item);
+        });
+    }
+
+    function renderGaleriaNuevasPreview() {
+        while (galeriaPreviewUrls.length) {
+            URL.revokeObjectURL(galeriaPreviewUrls.pop());
+        }
+        if (!galeriaNuevas) return;
+        galeriaNuevas.innerHTML = '';
+
+        galeriaFilesPendientes.forEach((file, index) => {
+            const url = URL.createObjectURL(file);
+            galeriaPreviewUrls.push(url);
+            const item = document.createElement('div');
+            item.className = 'admin-galeria-item relative';
+            item.innerHTML = `
+                <img src="${escapeAttr(url)}" alt="Nueva toma" class="w-16 aspect-[3/4] object-cover border border-secondary bg-surface-container" />
+                <button type="button" class="admin-galeria-remove absolute top-1 right-1 bg-surface/90 text-error text-xs px-1.5 py-0.5 uppercase tracking-widest" data-nuevo-index="${index}" title="Quitar">×</button>
+            `;
+            item.querySelector('.admin-galeria-remove')?.addEventListener('click', () => {
+                galeriaFilesPendientes.splice(index, 1);
+                syncGaleriaInputFiles();
+                renderGaleriaNuevasPreview();
+            });
+            galeriaNuevas.appendChild(item);
+        });
+    }
+
+    function onGaleriaInputChange() {
+        const nuevos = Array.from(galeriaInput?.files || []);
+        if (!nuevos.length) return;
+
+        nuevos.forEach((file) => {
+            const duplicado = galeriaFilesPendientes.some(
+                (f) => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified
+            );
+            if (!duplicado) {
+                galeriaFilesPendientes.push(file);
+            }
+        });
+
+        syncGaleriaInputFiles();
+        renderGaleriaNuevasPreview();
     }
 
     function openModal() {
@@ -75,7 +148,9 @@
         if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
         previewObjectUrl = null;
         imagenInput && (imagenInput.value = '');
-        renderColores([]);
+        if (imagenActualInput) imagenActualInput.value = '';
+        clearGaleriaPreviews();
+        renderGaleriaExistente([]);
     }
 
     function hideMessages() {
@@ -104,15 +179,20 @@
     }
 
     function populateForm(producto, categorias) {
+        const imagenPath = producto?.imagen_principal || '';
         document.getElementById('admin-id').value = producto?.id || '';
         document.getElementById('admin-action').value = producto?.id ? 'update' : 'create';
         document.getElementById('admin-modal-title').textContent = producto?.id ? 'Editar producto' : 'Nuevo producto';
         document.getElementById('admin-nombre').value = producto?.nombre || '';
         document.getElementById('admin-precio').value = producto?.precio || '';
-        document.getElementById('admin-imagen').value = producto?.imagen_principal || '';
+        if (imagenActualInput) imagenActualInput.value = imagenPath;
+        // Solo mostrar URL externa en el campo; las rutas locales se conservan en el hidden.
+        document.getElementById('admin-imagen').value = isExternalImage(imagenPath) ? imagenPath : '';
         imagenInput && (imagenInput.value = '');
-        imagenPreview.src = producto?.imagen_principal ? resolveImageSrc(producto.imagen_principal) : '';
-        imagenPreview.classList.toggle('hidden', !producto?.imagen_principal);
+        imagenPreview.src = imagenPath ? resolveImageSrc(imagenPath) : '';
+        imagenPreview.classList.toggle('hidden', !imagenPath);
+        renderGaleriaExistente(producto?.imagenes || []);
+        clearGaleriaPreviews();
         document.getElementById('admin-descripcion').value = producto?.descripcion || '';
         document.getElementById('admin-lavado').value = producto?.lavado || '';
         document.getElementById('admin-fit').value = producto?.fit || '';
@@ -120,7 +200,6 @@
         document.getElementById('admin-tallas').value = (producto?.tallas || []).join(', ');
         document.getElementById('admin-activo').checked = producto?.id ? Number(producto.activo) === 1 : true;
         fillCategorias(categorias, producto?.categoria_id || categorias[0]?.id);
-        renderColores(producto?.colores || []);
         deleteBtn?.classList.toggle('hidden', !producto?.id);
     }
 
@@ -154,7 +233,10 @@
 
     imagenInput?.addEventListener('change', () => {
         const file = imagenInput.files?.[0];
-        if (!file) { updatePreview(imagenUrlInput?.value); return; }
+        if (!file) {
+            updatePreview(imagenActualInput?.value || imagenUrlInput?.value);
+            return;
+        }
         if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
         previewObjectUrl = URL.createObjectURL(file);
         imagenPreview.src = previewObjectUrl;
@@ -162,8 +244,12 @@
     });
 
     imagenUrlInput?.addEventListener('input', () => {
-        if (!imagenInput?.files?.length) updatePreview(imagenUrlInput.value.trim());
+        if (!imagenInput?.files?.length) {
+            updatePreview(imagenUrlInput.value.trim() || imagenActualInput?.value);
+        }
     });
+
+    galeriaInput?.addEventListener('change', onGaleriaInputChange);
 
     function updatePreview(path) {
         if (!imagenPreview) return;
@@ -172,17 +258,19 @@
         imagenPreview.classList.remove('hidden');
     }
 
-    document.getElementById('admin-add-color')?.addEventListener('click', () => coloresList?.appendChild(createColorRow()));
-
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideMessages();
-        if (!coloresList?.querySelector('.admin-color-row')) {
-            showError('Agrega al menos un color con stock.');
-            return;
-        }
         const formData = new FormData(form);
         formData.set('action', document.getElementById('admin-action').value);
+
+        // Si no hay archivo nuevo ni URL externa, conservar la imagen actual.
+        const urlExterna = (imagenUrlInput?.value || '').trim();
+        const tieneArchivo = Boolean(imagenInput?.files?.length);
+        if (!tieneArchivo && !urlExterna && imagenActualInput?.value) {
+            formData.set('imagen_principal', '');
+        }
+
         if (document.getElementById('admin-activo').checked) formData.set('activo', '1');
         else formData.delete('activo');
         try {

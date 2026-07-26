@@ -54,27 +54,27 @@ html:not(.dark) .border-primary {
 }
 
 html:not(.dark) .bg-primary\/10 {
-    background-color: rgba(18, 19, 26, 0.06);
+    background-color: rgba(0, 0, 0, 0.06);
 }
 
 html:not(.dark) .bg-primary\/20 {
-    background-color: rgba(18, 19, 26, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 html:not(.dark) .bg-primary\/30 {
-    background-color: rgba(18, 19, 26, 0.15);
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 html:not(.dark) .bg-primary\/40 {
-    background-color: rgba(18, 19, 26, 0.25);
+    background-color: rgba(0, 0, 0, 0.25);
 }
 
 html:not(.dark) .bg-primary\/50 {
-    background-color: rgba(18, 19, 26, 0.35);
+    background-color: rgba(0, 0, 0, 0.35);
 }
 
 html:not(.dark) .from-primary\/60 {
-    --tw-gradient-from: rgba(18, 19, 26, 0.55);
+    --tw-gradient-from: rgba(0, 0, 0, 0.55);
     --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 

@@ -35,7 +35,8 @@ try {
             $productoId = (int) ($_POST['id'] ?? 0);
             $imagenResultado = resolverImagenPrincipal(
                 trim($_POST['imagen_principal'] ?? ''),
-                $action === 'update' ? $productoId : null
+                $action === 'update' ? $productoId : null,
+                trim($_POST['imagen_actual'] ?? '')
             );
 
             if (!$imagenResultado['ok']) {
@@ -43,18 +44,17 @@ try {
                 exit;
             }
 
-            $colores = procesarColoresFormulario($_POST);
-
-            if (empty($colores)) {
-                echo json_encode(['ok' => false, 'error' => 'Agrega al menos un color con su stock.']);
-                exit;
-            }
-
-            $imagenPrincipal = $imagenResultado['path'] ?: ($action === 'update' ? (Producto::obtenerPorIdAdmin($productoId)['imagen_principal'] ?? '') : '');
+            $imagenPrincipal = $imagenResultado['path'] ?: '';
 
             if ($imagenPrincipal === '') {
                 echo json_encode(['ok' => false, 'error' => 'Sube la imagen principal del producto.']);
                 exit;
+            }
+
+            $stockEstado = 'disponible';
+            if ($action === 'update' && $productoId > 0) {
+                $existente = Producto::obtenerPorIdAdmin($productoId);
+                $stockEstado = $existente['stock_estado'] ?? 'disponible';
             }
 
             $datos = [
@@ -66,10 +66,9 @@ try {
                 'lavado' => trim($_POST['lavado'] ?? ''),
                 'fit' => trim($_POST['fit'] ?? ''),
                 'material_info' => trim($_POST['material_info'] ?? ''),
-                'stock_estado' => Producto::calcularStockEstado(array_sum(array_column($colores, 'stock_cantidad'))),
+                'stock_estado' => $stockEstado,
                 'activo' => isset($_POST['activo']) ? 1 : ($action === 'create' ? 1 : 0),
                 'tallas' => Producto::parseTallasInput($_POST['tallas'] ?? ''),
-                'colores' => $colores,
             ];
 
             if ($datos['nombre'] === '' || $datos['categoria_id'] <= 0 || $datos['descripcion'] === '') {
@@ -84,6 +83,7 @@ try {
 
             if ($action === 'create') {
                 $nuevoId = Producto::crear($datos);
+                guardarGaleriaProducto($nuevoId);
                 echo json_encode(['ok' => true, 'message' => 'Producto creado correctamente.', 'id' => $nuevoId]);
                 break;
             }
@@ -94,6 +94,7 @@ try {
             }
 
             Producto::actualizar($productoId, $datos);
+            guardarGaleriaProducto($productoId);
             echo json_encode(['ok' => true, 'message' => 'Producto actualizado correctamente.', 'id' => $productoId]);
             break;
 
@@ -183,7 +184,7 @@ try {
     echo json_encode(['ok' => false, 'error' => 'Error al procesar la solicitud.']);
 }
 
-function resolverImagenPrincipal(string $urlImagen, ?int $productoId = null): array
+function resolverImagenPrincipal(string $urlImagen, ?int $productoId = null, string $imagenActual = ''): array
 {
     $archivo = $_FILES['imagen_archivo'] ?? null;
 
@@ -191,8 +192,13 @@ function resolverImagenPrincipal(string $urlImagen, ?int $productoId = null): ar
         return ImagenProducto::guardar($archivo);
     }
 
-    if ($urlImagen !== '') {
+    // Solo aceptar URL externa explícita (no rutas locales pegadas en el campo).
+    if ($urlImagen !== '' && (preg_match('#^https?://#i', $urlImagen) || str_starts_with($urlImagen, '//'))) {
         return ['ok' => true, 'path' => $urlImagen];
+    }
+
+    if ($imagenActual !== '') {
+        return ['ok' => true, 'path' => $imagenActual];
     }
 
     if ($productoId) {
@@ -206,32 +212,6 @@ function resolverImagenPrincipal(string $urlImagen, ?int $productoId = null): ar
     return ['ok' => false, 'error' => 'Sube una imagen o indica una URL.'];
 }
 
-function procesarColoresFormulario(array $post): array
-{
-    $nombres = $post['colores_nombre'] ?? [];
-    $stocks = $post['colores_stock'] ?? [];
-    $colores = [];
-
-    if (!is_array($nombres)) {
-        return [];
-    }
-
-    foreach ($nombres as $index => $nombre) {
-        $nombre = trim((string) $nombre);
-        if ($nombre === '') {
-            continue;
-        }
-
-        $colores[] = [
-            'nombre' => $nombre,
-            'stock_cantidad' => max(0, (int) ($stocks[$index] ?? 0)),
-            'orden' => count($colores),
-        ];
-    }
-
-    return $colores;
-}
-
 function resolverImagenGaleria(string $urlImagen, ?string $urlActual = null): array
 {
     $archivo = $_FILES['imagen_archivo'] ?? null;
@@ -240,7 +220,7 @@ function resolverImagenGaleria(string $urlImagen, ?string $urlActual = null): ar
         return ImagenProducto::guardar($archivo);
     }
 
-    if ($urlImagen !== '') {
+    if ($urlImagen !== '' && (preg_match('#^https?://#i', $urlImagen) || str_starts_with($urlImagen, '//'))) {
         return ['ok' => true, 'path' => $urlImagen];
     }
 
@@ -249,4 +229,59 @@ function resolverImagenGaleria(string $urlImagen, ?string $urlActual = null): ar
     }
 
     return ['ok' => false, 'error' => 'Sube una imagen o indica una URL.'];
+}
+
+function guardarGaleriaProducto(int $productoId): void
+{
+    if ($productoId <= 0) {
+        return;
+    }
+
+    $eliminarIds = $_POST['galeria_eliminar'] ?? [];
+    if (!is_array($eliminarIds)) {
+        $eliminarIds = [$eliminarIds];
+    }
+    Producto::eliminarImagenes($productoId, $eliminarIds);
+
+    $paths = [];
+    $files = $_FILES['galeria_archivos'] ?? null;
+
+    if (is_array($files) && isset($files['name'])) {
+        // Un solo archivo: PHP a veces no lo entrega como array.
+        if (!is_array($files['name'])) {
+            $files = [
+                'name' => [$files['name']],
+                'type' => [$files['type'] ?? ''],
+                'tmp_name' => [$files['tmp_name'] ?? ''],
+                'error' => [$files['error'] ?? UPLOAD_ERR_NO_FILE],
+                'size' => [$files['size'] ?? 0],
+            ];
+        }
+
+        $total = count($files['name']);
+
+        for ($i = 0; $i < $total; $i++) {
+            if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+
+            $archivo = [
+                'name' => $files['name'][$i],
+                'type' => $files['type'][$i] ?? '',
+                'tmp_name' => $files['tmp_name'][$i] ?? '',
+                'error' => $files['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                'size' => $files['size'][$i] ?? 0,
+            ];
+
+            $resultado = ImagenProducto::guardar($archivo);
+
+            if (!empty($resultado['ok']) && !empty($resultado['path'])) {
+                $paths[] = $resultado['path'];
+            }
+        }
+    }
+
+    if (!empty($paths)) {
+        Producto::agregarImagenes($productoId, $paths);
+    }
 }

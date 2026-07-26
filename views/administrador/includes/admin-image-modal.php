@@ -31,7 +31,7 @@ $adminApiUrl = $adminControllersPath . 'productoController.php';
 
             <p id="admin-image-hint" class="font-body-md text-body-md text-on-surface-variant"></p>
 
-            <img id="admin-image-preview" src="" alt="Vista previa" class="admin-image-modal-preview w-full hidden border border-outline-variant" />
+            <img id="admin-image-preview" src="" alt="Vista previa" class="admin-image-modal-preview hidden border border-outline-variant" />
 
             <div>
                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-image-file">Subir imagen</label>
@@ -39,7 +39,7 @@ $adminApiUrl = $adminControllersPath . 'productoController.php';
             </div>
             <div>
                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-widest" for="admin-image-url">O URL externa</label>
-                <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="admin-image-url" name="url" type="url" placeholder="https://..." />
+                <input class="w-full py-3 px-0 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="admin-image-url" name="url" type="text" placeholder="https://..." autocomplete="off" />
             </div>
 
             <p id="admin-image-error" class="hidden text-error font-body-md text-body-md"></p>

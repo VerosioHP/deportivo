@@ -7,16 +7,49 @@ require_once __DIR__ . '/Producto.php';
 class Pedido
 {
     public const ESTADOS = ['pendiente', 'confirmado', 'enviado', 'cancelado'];
+    public const ZONAS = ['metropolitana', 'nacional'];
+    public const METODOS_PAGO = ['contraentrega', 'transferencia'];
 
     public static function numeroPublico(array $pedido): string
     {
         $numero = trim((string) ($pedido['numero'] ?? ''));
 
-        if ($numero !== '' && preg_match('/^\d{5}$/', $numero)) {
-            return $numero;
+        if ($numero === '' || !preg_match('/^\d{5}$/', $numero)) {
+            $numero = str_pad((string) (int) ($pedido['id'] ?? 0), 5, '0', STR_PAD_LEFT);
         }
 
-        return str_pad((string) (int) ($pedido['id'] ?? 0), 5, '0', STR_PAD_LEFT);
+        return 'PED-' . $numero;
+    }
+
+    public static function normalizarCiudad(string $ciudad): string
+    {
+        $ciudad = mb_strtolower(trim($ciudad), 'UTF-8');
+        $reemplazos = [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+            'ü' => 'u', 'ñ' => 'n',
+        ];
+
+        return strtr($ciudad, $reemplazos);
+    }
+
+    public static function esZonaMetropolitana(string $ciudad): bool
+    {
+        static $ciudades = null;
+
+        if ($ciudades === null) {
+            $config = require __DIR__ . '/../config/pago.php';
+            $ciudades = array_map(
+                [self::class, 'normalizarCiudad'],
+                $config['ciudades_metropolitanas'] ?? []
+            );
+        }
+
+        return in_array(self::normalizarCiudad($ciudad), $ciudades, true);
+    }
+
+    public static function zonaDesdeCiudad(string $ciudad): string
+    {
+        return self::esZonaMetropolitana($ciudad) ? 'metropolitana' : 'nacional';
     }
 
     public static function generarNumeroUnico(): string
@@ -54,11 +87,13 @@ class Pedido
         $conexion->beginTransaction();
 
         try {
+            $zonaEnvio = self::zonaDesdeCiudad((string) $envio['ciudad']);
+
             $stmt = $conexion->prepare(
                 'INSERT INTO pedidos
-                (numero, usuario_id, nombre, apellido, email, telefono, direccion, ciudad, provincia, codigo_postal, notas, subtotal, envio, total)
+                (numero, usuario_id, nombre, apellido, email, telefono, direccion, ciudad, provincia, zona_envio, codigo_postal, notas, subtotal, envio, total)
                 VALUES
-                (:numero, :usuario_id, :nombre, :apellido, :email, :telefono, :direccion, :ciudad, :provincia, :codigo_postal, :notas, :subtotal, :envio, :total)'
+                (:numero, :usuario_id, :nombre, :apellido, :email, :telefono, :direccion, :ciudad, :provincia, :zona_envio, :codigo_postal, :notas, :subtotal, :envio, :total)'
             );
 
             $stmt->execute([
@@ -71,6 +106,7 @@ class Pedido
                 ':direccion' => $envio['direccion'],
                 ':ciudad' => $envio['ciudad'],
                 ':provincia' => $envio['provincia'],
+                ':zona_envio' => $zonaEnvio,
                 ':codigo_postal' => $envio['codigo_postal'],
                 ':notas' => $envio['notas'] ?: null,
                 ':subtotal' => $subtotal,
@@ -216,6 +252,111 @@ class Pedido
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         return $stmt->execute() && $stmt->rowCount() > 0;
+    }
+
+    public static function registrarPago(int $id, string $metodoPago, ?string $comprobantePath = null): bool
+    {
+        global $conexion;
+
+        if (!in_array($metodoPago, self::METODOS_PAGO, true)) {
+            return false;
+        }
+
+        if ($metodoPago === 'transferencia' && ($comprobantePath === null || $comprobantePath === '')) {
+            return false;
+        }
+
+        $stmt = $conexion->prepare(
+            'UPDATE pedidos
+             SET metodo_pago = :metodo_pago,
+                 comprobante_pago = :comprobante_pago
+             WHERE id = :id'
+        );
+
+        $stmt->bindValue(':metodo_pago', $metodoPago);
+        $stmt->bindValue(':comprobante_pago', $metodoPago === 'transferencia' ? $comprobantePath : null);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute() && $stmt->rowCount() > 0;
+    }
+
+    public static function cancelarPorCliente(int $id): bool
+    {
+        global $conexion;
+
+        $pedido = self::obtenerPorId($id);
+
+        if (!$pedido) {
+            return false;
+        }
+
+        if (!empty($pedido['metodo_pago']) || ($pedido['estado'] ?? '') !== 'pendiente') {
+            return false;
+        }
+
+        $conexion->beginTransaction();
+
+        try {
+            foreach ($pedido['items'] ?? [] as $item) {
+                $productoId = (int) ($item['producto_id'] ?? 0);
+                $cantidad = (int) ($item['cantidad'] ?? 0);
+                $colorNombre = trim((string) ($item['color'] ?? ''));
+
+                if ($productoId <= 0 || $cantidad <= 0) {
+                    continue;
+                }
+
+                Producto::reponerStockPorNombre($productoId, $colorNombre, $cantidad);
+            }
+
+            $stmt = $conexion->prepare(
+                "UPDATE pedidos SET estado = 'cancelado' WHERE id = :id AND estado = 'pendiente' AND metodo_pago IS NULL"
+            );
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                throw new RuntimeException('No se pudo cancelar el pedido.');
+            }
+
+            $conexion->commit();
+
+            return true;
+        } catch (Throwable $e) {
+            $conexion->rollBack();
+            throw $e;
+        }
+    }
+
+    public static function etiquetaMetodoPago(?string $metodo): string
+    {
+        return match ($metodo) {
+            'contraentrega' => 'Contraentrega',
+            'transferencia' => 'Transferencia',
+            default => 'Sin definir',
+        };
+    }
+
+    public static function etiquetaZonaEnvio(?string $zona): string
+    {
+        return match ($zona) {
+            'metropolitana' => 'Área metropolitana',
+            'nacional' => 'Resto del país',
+            default => 'Sin definir',
+        };
+    }
+
+    public static function urlComprobante(?string $ruta): string
+    {
+        if ($ruta === null || trim($ruta) === '') {
+            return '';
+        }
+
+        if (function_exists('deportivo_upload_url')) {
+            return deportivo_upload_url($ruta);
+        }
+
+        return '/' . ltrim($ruta, '/');
     }
 
     public static function enriquecerItemsConImagen(array $items): array
