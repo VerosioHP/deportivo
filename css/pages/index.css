@@ -1,76 +1,219 @@
-.hero-cover {
+/* Hero con globo interactivo */
+.hero-globe {
     position: relative;
     width: 100%;
     min-height: calc(100vh - 56px);
     min-height: calc(100dvh - 56px);
-    overflow: hidden;
     display: flex;
-    align-items: flex-end;
-    background: #0a0a0a;
-}
-
-.hero-cover-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    filter: brightness(0.6) contrast(1.05) saturate(0.9);
-}
-
-.hero-cover-shade {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    padding: 2.5rem 1.25rem 3rem;
+    overflow: hidden;
     background:
-        linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.18) 100%);
+        radial-gradient(ellipse 70% 55% at 50% 35%, rgba(40, 90, 160, 0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, color-mix(in srgb, var(--color-secondary) 12%, transparent) 0%, transparent 55%),
+        var(--color-surface);
 }
 
-.hero-cover-layout {
+html.dark .hero-globe {
+    background:
+        radial-gradient(ellipse 70% 55% at 50% 35%, rgba(40, 90, 160, 0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, color-mix(in srgb, var(--color-secondary) 16%, transparent) 0%, transparent 55%),
+        #050505;
+}
+
+.hero-globe-stage {
     position: relative;
-    z-index: 2;
+    width: min(100%, 560px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-globe-canvas-wrap {
+    position: relative;
     width: 100%;
-    max-width: var(--spacing-container-max, 1440px);
+    aspect-ratio: 1;
+    max-width: min(72vw, 460px);
     margin-inline: auto;
-    padding-block: 3.5rem 4rem;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
 }
 
-.hero-cover-content {
-    color: #fff;
+.hero-globe-canvas-wrap.is-dragging {
+    cursor: grabbing;
 }
 
-.hero-cover-content h1 {
+.hero-globe-canvas-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    border-radius: 50%;
+    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.25));
+}
+
+html.dark .hero-globe-canvas-wrap canvas {
+    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.55));
+}
+
+.hero-globe-labels {
+    position: absolute !important;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.hero-globe-country {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.65);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    transform: translate(-50%, -50%);
+}
+
+.hero-globe-country.is-hidden {
+    opacity: 0 !important;
+    visibility: hidden;
+}
+
+.hero-globe-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 0.35rem;
+    transform: translateX(-50%);
+    color: color-mix(in srgb, var(--color-on-surface) 45%, transparent);
+    white-space: nowrap;
+    pointer-events: none;
+    font-size: 0.65rem;
+    z-index: 2;
+}
+
+html.dark .hero-globe-hint {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.hero-globe-title {
+    margin: 0;
+    max-width: 18ch;
+    text-align: center;
+    color: #0a0a0a;
+    font-family: Anybody, sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+}
+
+html.dark .hero-globe-title {
+    color: #fff;
+    text-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
 }
 
 @media (min-width: 1024px) {
-    .hero-cover {
+    .hero-globe {
         min-height: calc(100vh - 60px);
         min-height: calc(100dvh - 60px);
+        gap: 2.25rem;
+        padding-block: 3rem 3.5rem;
     }
 
-    .hero-cover-bg {
-        object-position: center 35%;
-    }
-
-    .hero-cover-layout {
-        padding-block: 4.5rem 5rem;
+    .hero-globe-canvas-wrap {
+        max-width: 520px;
     }
 }
 
 @media (max-width: 767px) {
-    .hero-cover {
+    .hero-globe {
         min-height: calc(100vh - 52px);
         min-height: calc(100dvh - 52px);
+        gap: 1.25rem;
+        padding: 1.75rem 0.75rem 2.25rem;
     }
 
-    .hero-cover-bg {
-        object-position: 62% center;
+    .hero-globe-stage {
+        width: 100%;
     }
 
-    .hero-cover-layout {
-        padding-block: 2.5rem 3rem;
+    .hero-globe-canvas-wrap {
+        max-width: min(78vw, 340px);
+    }
+
+    .hero-globe-hint {
+        font-size: 0.58rem;
+        bottom: -0.15rem;
+    }
+
+    .hero-globe-title {
+        max-width: 16ch;
+        padding-inline: 0.75rem;
+    }
+
+    .hero-globe-country {
+        font-size: 0.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-globe-title {
+        transition: none;
+    }
+}
+
+/* Aviso de próxima colección */
+.coming-soon-band {
+    position: relative;
+    overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 100%, color-mix(in srgb, var(--color-secondary) 18%, transparent) 0%, transparent 55%),
+        linear-gradient(160deg, var(--color-surface-container) 0%, var(--color-surface) 45%, var(--color-surface-container-high, var(--color-surface-container)) 100%);
+    border-block: 1px solid var(--color-outline-variant);
+}
+
+html.dark .coming-soon-band {
+    background:
+        radial-gradient(ellipse 70% 50% at 50% 110%, color-mix(in srgb, var(--color-secondary) 22%, transparent) 0%, transparent 50%),
+        linear-gradient(165deg, #111111 0%, #0a0a0a 50%, #161616 100%);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.coming-soon-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--spacing-container-max, 1440px);
+    margin-inline: auto;
+    padding-block: 5rem;
+}
+
+.coming-soon-inner h2 {
+    color: var(--color-primary);
+}
+
+html.dark .coming-soon-inner h2 {
+    color: var(--color-primary-fixed, #fff);
+}
+
+@media (max-width: 767px) {
+    .coming-soon-band {
+        min-height: 360px;
+    }
+
+    .coming-soon-inner {
+        padding-block: 3.5rem;
     }
 }
