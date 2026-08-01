@@ -8,6 +8,16 @@ $navInViews = true;
 $activePage = 'nosotros';
 $cartBasePath = $assetBase;
 $cartUrl = 'carrito_compras.php';
+$catalogoUrl = 'catalogo.php?categoria=camisetas';
+
+$medellinFotos = [
+    ['key' => 'medellin_1', 'alt' => 'Vista de Medellín entre montañas', 'label' => 'Medellín'],
+    ['key' => 'medellin_2', 'alt' => 'Calles y ritmo de la ciudad', 'label' => 'La ciudad'],
+    ['key' => 'medellin_3', 'alt' => 'Paisaje urbano de Antioquia', 'label' => 'Antioquia'],
+    ['key' => 'medellin_4', 'alt' => 'Montañas alrededor del valle', 'label' => 'El valle'],
+    ['key' => 'medellin_5', 'alt' => 'Horizonte natural de la región', 'label' => 'Horizonte'],
+    ['key' => 'medellin_6', 'alt' => 'Ambiente de ciudad viva', 'label' => 'Calle'],
+];
 ?>
 <!doctype html>
 
@@ -15,98 +25,181 @@ $cartUrl = 'carrito_compras.php';
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Nuestra Historia | DEPORTIVO</title>
+    <title>Nuestra Historia | VEMA</title>
     <?php $pageCss = 'pages/nosotros.css'; include __DIR__ . '/../includes/design-head.php'; ?>
 </head>
-<body class="bg-background dark:bg-on-background text-on-surface dark:text-inverse-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed transition-colors duration-300<?= deportivo_admin_body_class() ?>">
+<body class="bg-surface dark:bg-on-background text-on-surface dark:text-inverse-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed transition-colors duration-300<?= deportivo_admin_body_class() ?>">
 
     <?php include __DIR__ . '/../includes/site-nav.php'; ?>
     <?php include dirname(__DIR__, 2) . '/administrador/includes/admin-panel.php'; ?>
 
-    <main>
-        <section class="page-hero min-h-[70vh]">
-            <img src="<?= deportivo_img_ctx('nosotros_hero', 'xl') ?>" alt="Atletas en pista de atletismo"<?= deportivo_admin_site_img('nosotros_hero') ?> />
-            <div class="absolute inset-0 bg-black/45"></div>
-            <div class="page-hero-content text-white text-center flex flex-col items-center justify-end pb-20">
-                <h1 class="font-display-lg text-display-lg md:text-[72px] leading-none mb-4 uppercase">Nuestra Historia</h1>
-                <div class="w-16 h-1 bg-secondary"></div>
-            </div>
+    <main class="nosotros-page">
+        <!-- Apertura tipográfica (sin imagen ancha) -->
+        <section class="nosotros-intro editorial-reveal">
+            <h1 class="nosotros-intro-title font-display-lg uppercase">
+                Nacimos en una casa.<br/>
+                <span class="text-secondary">Crecemos con la ciudad.</span>
+            </h1>
+            <p class="nosotros-intro-lead font-body-lg text-on-surface-variant">
+                VEMA es una marca de camisetas deportivas con alma street. Esta es nuestra historia —por ahora simulada—
+                inspirada en Medellín, en el entrenamiento diario y en la idea de conquistar el mundo juntos.
+            </p>
         </section>
 
-        <section class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-24 editorial-reveal">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter-desktop items-center">
-                <div class="md:col-span-5">
-                    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-4">Quiénes somos</span>
-                    <h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed mb-8 uppercase">Pasión por el movimiento</h2>
-                    <p class="font-body-lg text-on-surface-variant leading-relaxed">
-                        En Deportivo equipamos a quienes viven el deporte con intensidad. Correr, nadar, jugar al tenis o levantar en el gym: cada prenda está pensada para acompañar tu esfuerzo.
+        <!-- Mosaico Medellín (imágenes desde admin) -->
+        <section class="nosotros-mosaic editorial-reveal" aria-label="Medellín">
+            <?php foreach ($medellinFotos as $i => $foto): ?>
+            <?php
+                $src = deportivo_img_ctx($foto['key'], $i < 2 ? 'lg' : 'md');
+                $tieneImg = $src !== '';
+            ?>
+            <figure class="nosotros-mosaic-item nosotros-mosaic-item--<?= $i + 1 ?><?= $tieneImg ? '' : ' is-empty' ?>">
+                <img
+                    src="<?= $tieneImg ? htmlspecialchars($src) : '' ?>"
+                    alt="<?= htmlspecialchars($foto['alt']) ?>"
+                    loading="<?= $i < 2 ? 'eager' : 'lazy' ?>"
+                    <?= deportivo_admin_site_img($foto['key']) ?>
+                />
+                <figcaption class="font-label-sm text-label-sm uppercase tracking-widest"><?= htmlspecialchars($foto['label']) ?></figcaption>
+            </figure>
+            <?php endforeach; ?>
+        </section>
+
+        <!-- Origen -->
+        <section class="nosotros-story editorial-reveal">
+            <div class="nosotros-story-grid">
+                <div>
+                    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-4">El origen</span>
+                    <h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed uppercase mb-6 leading-tight">
+                        Una idea en el<br/>sur de Medellín
+                    </h2>
+                </div>
+                <div class="space-y-5 font-body-lg text-on-surface-variant leading-relaxed">
+                    <p>
+                        Todo empezó en una casa del sur de la ciudad: un espacio sencillo, conversaciones largas
+                        y la certeza de que Medellín se mueve —entrena, camina, vive— con una energía propia.
                     </p>
-                    <p class="mt-6 font-body-md text-on-surface-variant">
-                        Tejidos técnicos que regulan la temperatura, absorben el sudor y se adaptan a cada movimiento del cuerpo.
+                    <p>
+                        Queríamos una camiseta que rindiera de verdad: tela Dry-Fit, corte atlético y un look
+                        que se sintiera street, no de laboratorio. Así nació VEMA: una marca local con ambición global.
+                    </p>
+                    <p class="font-label-md text-label-md text-primary uppercase tracking-widest pt-2">
+                        * Texto simulado · se reemplazará con la historia real
                     </p>
                 </div>
-                <div class="md:col-start-7 md:col-span-6">
-                    <div class="aspect-[4/5] overflow-hidden">
-                        <img class="w-full h-full object-cover" alt="Entrenamiento de fuerza en gimnasio" src="<?= deportivo_img_ctx('nosotros_tejido', 'md') ?>"<?= deportivo_admin_site_img('nosotros_tejido') ?> />
-                    </div>
+            </div>
+        </section>
+
+        <!-- Línea de tiempo simulada
+        <section class="nosotros-timeline editorial-reveal">
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-10 text-center">El camino</span>
+            <ol class="nosotros-timeline-list">
+                <li>
+                    <span class="nosotros-timeline-year">01</span>
+                    <h3 class="font-headline-sm text-headline-sm uppercase mb-2">La casa</h3>
+                    <p class="font-body-md text-on-surface-variant">Bocetos, primeras pruebas de tela y la decisión de enfocarnos solo en camisetas.</p>
+                </li>
+                <li>
+                    <span class="nosotros-timeline-year">02</span>
+                    <h3 class="font-headline-sm text-headline-sm uppercase mb-2">La calle</h3>
+                    <p class="font-body-md text-on-surface-variant">Salimos a entrenar con lo que fabricábamos. Medellín fue nuestro primer laboratorio.</p>
+                </li>
+                <li>
+                    <span class="nosotros-timeline-year">03</span>
+                    <h3 class="font-headline-sm text-headline-sm uppercase mb-2">La marca</h3>
+                    <p class="font-body-md text-on-surface-variant">VEMA toma forma: identidad, catálogo y la promesa de calidad que se siente al usarla.</p>
+                </li>
+                <li>
+                    <span class="nosotros-timeline-year">04</span>
+                    <h3 class="font-headline-sm text-headline-sm uppercase mb-2">El mundo</h3>
+                    <p class="font-body-md text-on-surface-variant">Hoy soñamos en grande: que una camiseta hecha aquí acompañe a quien se mueve en cualquier ciudad.</p>
+                </li>
+            </ol>
+        </section> -->
+
+        <!-- Pulso interactivo VEMA -->
+        <section class="nosotros-timeline editorial-reveal" data-nosotros-pulse aria-label="El pulso de VEMA">
+            <div class="nosotros-pulse-inner">
+                <!-- <span class="nosotros-pulse-label font-label-sm text-label-sm uppercase tracking-[0.25em]">El pulso</span> -->
+                <p class="nosotros-pulse-hint font-body-md text-on-surface-variant">Toca las casillas en orden numérico. Cada una es un pedazo de nosotros.</p>
+
+                <div class="nosotros-pulse-stage" aria-live="polite">
+                    <div class="nosotros-pulse-ring" data-pulse-ring aria-hidden="true"></div>
+                    <p class="nosotros-pulse-kicker font-label-sm uppercase tracking-widest" data-pulse-kicker>Empieza aquí</p>
+                    <h2 class="nosotros-pulse-title font-display-lg uppercase" data-pulse-title>¿Listo para conocernos de verdad?</h2>
+                    <p class="nosotros-pulse-copy font-body-lg" data-pulse-copy>Cuatro casillas. Cero discursos aburridos. Solo actitud de Medellín.</p>
                 </div>
-            </div>
-        </section>
 
-        <div class="marquee-wrap" aria-hidden="true">
-            <div class="marquee-track">
-                <?php foreach (array_merge(['Running','Gym','Tenis','Básquet','Natación','Yoga'], ['Running','Gym','Tenis','Básquet','Natación','Yoga']) as $d) : ?>
-                <span class="marquee-item"><span class="marquee-dot"></span><?= $d ?></span>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <section class="bg-surface-container-low dark:bg-tertiary-container py-24 editorial-reveal">
-            <div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center">
-                <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-4">Nuestra comunidad</span>
-                <h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed mb-12 uppercase">Para quién trabajamos</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <div><p class="font-headline-sm text-primary uppercase mb-2">Activo</p><p class="text-on-surface-variant">El deporte como estilo de vida.</p></div>
-                    <div><p class="font-headline-sm text-primary uppercase mb-2">Competitivo</p><p class="text-on-surface-variant">Rendimiento que marca la diferencia.</p></div>
-                    <div><p class="font-headline-sm text-primary uppercase mb-2">Exigente</p><p class="text-on-surface-variant">Calidad y durabilidad en cada sesión.</p></div>
+                <div class="nosotros-pulse-pads" role="group" aria-label="Beats de VEMA">
+                    <button type="button" class="nosotros-pulse-pad" data-pulse-pad="casa" aria-pressed="false">
+                        <span class="nosotros-pulse-pad-num">01</span>
+                        <span class="nosotros-pulse-pad-name">Casa</span>
+                    </button>
+                    <button type="button" class="nosotros-pulse-pad" data-pulse-pad="sudor" aria-pressed="false">
+                        <span class="nosotros-pulse-pad-num">02</span>
+                        <span class="nosotros-pulse-pad-name">Sudor</span>
+                    </button>
+                    <button type="button" class="nosotros-pulse-pad" data-pulse-pad="calle" aria-pressed="false">
+                        <span class="nosotros-pulse-pad-num">03</span>
+                        <span class="nosotros-pulse-pad-name">Calle</span>
+                    </button>
+                    <button type="button" class="nosotros-pulse-pad" data-pulse-pad="mundo" aria-pressed="false">
+                        <span class="nosotros-pulse-pad-num">04</span>
+                        <span class="nosotros-pulse-pad-name">Mundo</span>
+                    </button>
                 </div>
-            </div>
-        </section>
 
-        <section class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-24 editorial-reveal">
-            <h2 class="font-headline-md text-headline-md text-primary text-center mb-14 uppercase">Por qué elegirnos</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <?php
-                $pilares = [
-                    ['icon' => 'verified', 'title' => 'Calidad', 'text' => 'Tejidos probados en condiciones reales de entrenamiento.'],
-                    ['icon' => 'water_drop', 'title' => 'Dry-Fit', 'text' => 'Absorbe el sudor y se seca al instante.'],
-                    ['icon' => 'fitness_center', 'title' => 'Ajuste atlético', 'text' => 'Libertad total de movimiento.'],
-                    ['icon' => 'all_inclusive', 'title' => 'Durabilidad', 'text' => 'Costuras reforzadas para aguantar lavado tras lavado.'],
-                ];
-                foreach ($pilares as $p) : ?>
-                <div class="pillar-card bg-surface dark:bg-tertiary-container">
-                    <span class="material-symbols-outlined text-secondary text-4xl mb-4"><?= $p['icon'] ?></span>
-                    <h3 class="font-headline-sm text-primary uppercase mb-3"><?= $p['title'] ?></h3>
-                    <p class="font-body-md text-on-surface-variant"><?= $p['text'] ?></p>
-                </div>
-                <?php endforeach; ?>
+                <p class="nosotros-pulse-finale font-label-md uppercase tracking-widest" data-pulse-finale hidden>
+                    Ya nos conoces. Ahora muévete.
+                    <a href="<?= htmlspecialchars($catalogoUrl) ?>" class="nosotros-pulse-finale-link">Ver camisetas</a>
+                </p>
             </div>
         </section>
+        <br><br>
+        <!-- Qué somos -->
+        <!-- <section class="nosotros-values editorial-reveal">
+            <div class="nosotros-values-head">
+                <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-4">Hoy</span>
+                <h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed uppercase mb-4">Lo que nos define</h2>
+                <p class="font-body-md text-on-surface-variant max-w-xl">
+                    No somos una marca de mil categorías. Somos camisetas hechas para entrenar, salir y sentirte bien.
+                </p>
+            </div>
+            <ul class="nosotros-values-list">
+                <li>
+                    <span class="font-label-sm text-secondary uppercase tracking-widest">01</span>
+                    <strong class="font-headline-sm uppercase">Medellín primero</strong>
+                    <p class="font-body-md text-on-surface-variant">Nuestra identidad nace del valle, de sus montañas y de su gente activa.</p>
+                </li>
+                <li>
+                    <span class="font-label-sm text-secondary uppercase tracking-widest">02</span>
+                    <strong class="font-headline-sm uppercase">Tela que rinde</strong>
+                    <p class="font-body-md text-on-surface-variant">Dry-Fit, secado rápido y corte pensado para moverte sin límites.</p>
+                </li>
+                <li>
+                    <span class="font-label-sm text-secondary uppercase tracking-widest">03</span>
+                    <strong class="font-headline-sm uppercase">Street con actitud</strong>
+                    <p class="font-body-md text-on-surface-variant">Del gym a la calle: la misma prenda, el mismo carácter.</p>
+                </li>
+            </ul>
+        </section> -->
 
-        <section class="px-margin-mobile md:px-margin-desktop pb-24 editorial-reveal">
-            <div class="max-w-container-max-width mx-auto overflow-hidden h-[480px] md:h-[560px]">
-                <img class="w-full h-full object-cover" alt="Gimnasio con atletas entrenando" src="<?= deportivo_img_ctx('nosotros_gym', 'xl') ?>"<?= deportivo_admin_site_img('nosotros_gym') ?> />
-            </div>
-        </section>
+        <!-- CTA -->
+
+
+    
     </main>
 
     <?php $navInViews = true; include __DIR__ . '/../includes/site-footer.php'; ?>
 
+    <script src="<?= htmlspecialchars($clienteJsPath) ?>nosotros-pulse.js"></script>
     <script>
         const obs = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: 0.15 });
-        document.querySelectorAll('.editorial-reveal').forEach(el => obs.observe(el));
+            entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add('visible');
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.editorial-reveal').forEach((el) => obs.observe(el));
     </script>
     <?php $cartPart = 'modal'; include __DIR__ . '/../includes/cart-widget.php'; ?>
     <script src="<?= htmlspecialchars($assetBase) ?>js/theme/toggle.js"></script>

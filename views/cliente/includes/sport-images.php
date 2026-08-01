@@ -20,9 +20,16 @@ function deportivo_img(string $key, string $size = 'lg', bool $desdeVistas = fal
         'crossfit'            => 'photo-1517836357463-d25dfeac3438',
         'camisetas'           => 'photo-1521572163474-6864f9cf17ab',
         'pantalonetas'        => 'photo-1594381898411-846e7d193883',
-        'nosotros_hero'       => 'photo-1502904550040-7534597429ae',
-        'nosotros_tejido'     => 'photo-1571019614242-c5c5dee9f50b',
-        'nosotros_gym'        => 'photo-1534438327276-14e5300c3a48',
+        // Nosotros: sin Unsplash; se suben desde el admin.
+        'nosotros_hero'       => '',
+        'nosotros_tejido'     => '',
+        'nosotros_gym'        => '',
+        'medellin_1'          => '',
+        'medellin_2'          => '',
+        'medellin_3'          => '',
+        'medellin_4'          => '',
+        'medellin_5'          => '',
+        'medellin_6'          => '',
         'login_side'          => 'photo-1571019614242-c5c5dee9f50b',
         'catalogo_camisetas'  => 'photo-1521572163474-6864f9cf17ab',
         'catalogo_pantalonetas' => 'photo-1552674605-db6ffd4facb5',
@@ -34,11 +41,27 @@ function deportivo_img(string $key, string $size = 'lg', bool $desdeVistas = fal
         return SitioImagen::urlPublica($override, $desdeVistas);
     }
 
+    if (!array_key_exists($key, $images)) {
+        $photo = $images['running'];
+    } else {
+        $photo = $images[$key];
+    }
+
+    // Clave sin imagen por defecto (solo admin / override).
+    if ($photo === null || $photo === '') {
+        return '';
+    }
+
     $widths = ['xs' => 200, 'sm' => 500, 'md' => 900, 'lg' => 1200, 'xl' => 1920];
     $w = $widths[$size] ?? 1200;
-    $photo = $images[$key] ?? $images['running'];
 
     return "https://images.unsplash.com/{$photo}?w={$w}&q=85&auto=format&fit=crop";
+}
+
+/** True si hay imagen guardada o Unsplash por defecto para esa clave. */
+function deportivo_site_image_ready(string $key): bool
+{
+    return deportivo_img($key, 'sm') !== '';
 }
 
 function deportivo_sport_cards(): array

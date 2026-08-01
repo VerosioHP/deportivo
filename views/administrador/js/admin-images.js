@@ -27,6 +27,7 @@
 
     const SITE_LABELS = {
         hero_main: 'Hero principal',
+        hero_street: 'Hero street',
         running: 'Running',
         gym: 'Gimnasio',
         cycling: 'Ciclismo',
@@ -40,6 +41,12 @@
         nosotros_hero: 'Nosotros — hero',
         nosotros_tejido: 'Nosotros — tejido',
         nosotros_gym: 'Nosotros — gimnasio',
+        medellin_1: 'Nosotros — mosaico 1',
+        medellin_2: 'Nosotros — mosaico 2',
+        medellin_3: 'Nosotros — mosaico 3',
+        medellin_4: 'Nosotros — mosaico 4',
+        medellin_5: 'Nosotros — mosaico 5',
+        medellin_6: 'Nosotros — mosaico 6',
         login_side: 'Login lateral',
         catalogo_camisetas: 'Banner catálogo camisetas',
         catalogo_pantalonetas: 'Banner catálogo pantalonetas',
@@ -101,6 +108,13 @@
         previewEl.classList.remove('hidden');
     }
 
+    function siteImagePreviewSrc(triggerEl) {
+        if (!triggerEl) return '';
+        if (triggerEl.tagName === 'IMG') return triggerEl.src || '';
+        const child = triggerEl.querySelector('img');
+        return child?.src || '';
+    }
+
     function openSiteImageModal(key, triggerEl) {
         currentTrigger = triggerEl;
         typeInput.value = 'site';
@@ -108,7 +122,7 @@
         productIdInput.value = '';
         galleryIdInput.value = '';
         hintEl.textContent = `Imagen del sitio: ${SITE_LABELS[key] || key}. Los clientes verán el cambio al instante.`;
-        setPreview(triggerEl?.src || '');
+        setPreview(siteImagePreviewSrc(triggerEl));
         hideMessages();
         openModal();
     }
@@ -139,8 +153,15 @@
 
     function updateDomImages(type, detail) {
         if (type === 'site') {
-            document.querySelectorAll(`[data-admin-site-image="${detail.key}"]`).forEach((img) => {
-                img.src = detail.url;
+            document.querySelectorAll(`[data-admin-site-image="${detail.key}"]`).forEach((el) => {
+                if (el.tagName === 'IMG') {
+                    el.src = detail.url;
+                } else {
+                    const img = el.querySelector('img');
+                    if (img) img.src = detail.url;
+                }
+                el.classList?.remove('is-empty');
+                el.closest('.nosotros-mosaic-item')?.classList.remove('is-empty');
             });
             return;
         }
@@ -174,7 +195,7 @@
     fileInput?.addEventListener('change', () => {
         const file = fileInput.files?.[0];
         if (!file) {
-            setPreview(currentTrigger?.src || '');
+            setPreview(siteImagePreviewSrc(currentTrigger) || currentTrigger?.src || '');
             return;
         }
         clearPreviewUrl();

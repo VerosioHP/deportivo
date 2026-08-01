@@ -32,7 +32,7 @@ if (count($muestraCamisetas) < 4) {
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>VEMA — Camisetas deportivas</title>
+    <title>VEMA</title>
     <?php $pageCss = 'pages/index.css'; include __DIR__ . '/includes/design-head.php'; ?>
 </head>
 
