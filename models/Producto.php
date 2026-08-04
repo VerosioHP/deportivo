@@ -101,8 +101,55 @@ class Producto
     {
         $id = (int) $producto['id'];
         $producto['tallas'] = self::obtenerTallas($id);
-        $producto['colores'] = [];
+        $producto['colores'] = self::obtenerColores($id);
         $producto['imagenes'] = self::obtenerImagenes($id);
+        $producto['colores_filtro'] = self::coloresParaFiltro($producto);
+    }
+
+    /** Nombres de color para filtrar (tabla colores o pista en el nombre). */
+    public static function coloresParaFiltro(array $producto): array
+    {
+        $nombres = [];
+        foreach ($producto['colores'] ?? [] as $color) {
+            $nombre = trim((string) ($color['nombre'] ?? ''));
+            if ($nombre !== '') {
+                $nombres[$nombre] = true;
+            }
+        }
+
+        if ($nombres === []) {
+            $inferido = self::inferirColorDesdeNombre((string) ($producto['nombre'] ?? ''));
+            if ($inferido !== null) {
+                $nombres[$inferido] = true;
+            }
+        }
+
+        return array_keys($nombres);
+    }
+
+    public static function inferirColorDesdeNombre(string $nombre): ?string
+    {
+        $n = mb_strtolower($nombre, 'UTF-8');
+        $mapa = [
+            'negra' => 'Negro',
+            'negro' => 'Negro',
+            'blanca' => 'Blanco',
+            'blanco' => 'Blanco',
+            'gris' => 'Gris',
+            'azul' => 'Azul',
+            'roja' => 'Rojo',
+            'rojo' => 'Rojo',
+            'verde' => 'Verde',
+            'beige' => 'Beige',
+        ];
+
+        foreach ($mapa as $needle => $label) {
+            if (str_contains($n, $needle)) {
+                return $label;
+            }
+        }
+
+        return null;
     }
 
     public static function obtenerTallas(int $productoId): array
@@ -280,6 +327,8 @@ class Producto
         $tallas = [];
         $lavados = [];
         $fits = [];
+        $colores = [];
+        $precios = [];
 
         foreach ($productos as $producto) {
             foreach ($producto['tallas'] as $talla) {
@@ -291,12 +340,22 @@ class Producto
             if (!empty($producto['fit'])) {
                 $fits[$producto['fit']] = true;
             }
+            foreach ($producto['colores_filtro'] ?? self::coloresParaFiltro($producto) as $color) {
+                $colores[$color] = true;
+            }
+            $precios[] = (float) ($producto['precio'] ?? 0);
         }
+
+        $precioMin = $precios !== [] ? (int) floor(min($precios)) : 0;
+        $precioMax = $precios !== [] ? (int) ceil(max($precios)) : 0;
 
         return [
             'tallas' => array_keys($tallas),
             'lavados' => array_keys($lavados),
             'fits' => array_keys($fits),
+            'colores' => array_keys($colores),
+            'precio_min' => $precioMin,
+            'precio_max' => $precioMax,
         ];
     }
 

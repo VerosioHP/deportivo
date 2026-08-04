@@ -1,7 +1,12 @@
 (function () {
     'use strict';
 
-    const filters = { talla: null, lavados: new Set(), fits: new Set() };
+    const filters = {
+        talla: null,
+        colores: new Set(),
+        precioMin: null,
+        precioMax: null,
+    };
 
     function stockMessage(cantidad, colorNombre) {
         const color = (colorNombre || '').trim();
@@ -111,6 +116,17 @@
         });
     }
 
+    function readPriceInputs() {
+        const minInput = document.querySelector('[data-filter-precio-min]');
+        const maxInput = document.querySelector('[data-filter-precio-max]');
+        const minRaw = minInput?.value.trim();
+        const maxRaw = maxInput?.value.trim();
+        filters.precioMin = minRaw === '' || minRaw == null ? null : Number(minRaw);
+        filters.precioMax = maxRaw === '' || maxRaw == null ? null : Number(maxRaw);
+        if (Number.isNaN(filters.precioMin)) filters.precioMin = null;
+        if (Number.isNaN(filters.precioMax)) filters.precioMax = null;
+    }
+
     function initSidebarSizeFilters() {
         const container = document.getElementById('filter-tallas');
         if (!container) return;
@@ -118,37 +134,64 @@
         container.querySelectorAll('[data-filter-talla]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const value = btn.dataset.filterTalla;
-                const isActive = btn.classList.contains('bg-secondary');
+                const isActive = btn.classList.contains('is-active');
                 container.querySelectorAll('[data-filter-talla]').forEach((item) => {
-                    item.classList.remove('bg-secondary', 'text-on-secondary');
-                    item.classList.add('border-outline-variant');
+                    item.classList.remove('is-active');
                 });
-                if (isActive) filters.talla = null;
-                else {
+                if (isActive) {
+                    filters.talla = null;
+                } else {
                     filters.talla = value;
-                    btn.classList.add('bg-secondary', 'text-on-secondary');
-                    btn.classList.remove('border-outline-variant');
+                    btn.classList.add('is-active');
                 }
                 applyFilters();
             });
         });
     }
 
-    function initCheckboxFilters(selector, setRef) {
-        document.querySelectorAll(selector).forEach((input) => {
+    function initColorFilters() {
+        document.querySelectorAll('[data-filter-color]').forEach((input) => {
             input.addEventListener('change', () => {
-                setRef.clear();
-                document.querySelectorAll(selector + ':checked').forEach((c) => setRef.add(c.value));
+                filters.colores.clear();
+                document.querySelectorAll('[data-filter-color]:checked').forEach((c) => {
+                    filters.colores.add(c.value);
+                });
                 applyFilters();
+            });
+        });
+    }
+
+    function initPriceFilters() {
+        document.querySelectorAll('[data-filter-precio-min], [data-filter-precio-max]').forEach((input) => {
+            input.addEventListener('change', () => {
+                readPriceInputs();
+                applyFilters();
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    readPriceInputs();
+                    applyFilters();
+                }
             });
         });
     }
 
     function productMatches(card) {
         const tallas = (card.dataset.tallas || '').split(',').map((t) => t.trim()).filter(Boolean);
+        const colores = (card.dataset.colores || '').split(',').map((c) => c.trim()).filter(Boolean);
+        const precio = Number(card.dataset.precio || 0);
+
         if (filters.talla && !tallas.includes(filters.talla)) return false;
-        if (filters.lavados.size > 0 && !filters.lavados.has(card.dataset.lavado || '')) return false;
-        if (filters.fits.size > 0 && !filters.fits.has(card.dataset.fit || '')) return false;
+
+        if (filters.colores.size > 0) {
+            const hit = colores.some((c) => filters.colores.has(c));
+            if (!hit) return false;
+        }
+
+        if (filters.precioMin != null && precio < filters.precioMin) return false;
+        if (filters.precioMax != null && precio > filters.precioMax) return false;
+
         return true;
     }
 
@@ -161,48 +204,42 @@
             card.classList.toggle('hidden', !show);
             if (show) visible += 1;
         });
-        if (emptyMsg) emptyMsg.classList.toggle('hidden', visible > 0);
+        if (emptyMsg) emptyMsg.classList.toggle('hidden', visible > 0 || cards.length === 0);
     }
 
     function resetFilters() {
         filters.talla = null;
-        filters.lavados.clear();
-        filters.fits.clear();
+        filters.colores.clear();
+        filters.precioMin = null;
+        filters.precioMax = null;
+
         document.querySelectorAll('#filter-tallas [data-filter-talla]').forEach((btn) => {
-            btn.classList.remove('bg-secondary', 'text-on-secondary');
-            btn.classList.add('border-outline-variant');
+            btn.classList.remove('is-active');
         });
-        document.querySelectorAll('[data-filter-lavado], [data-filter-fit]').forEach((input) => {
+        document.querySelectorAll('[data-filter-color]').forEach((input) => {
             input.checked = false;
-            const indicator = input.closest('label')?.querySelector('[data-filter-indicator]');
-            if (indicator) { indicator.classList.remove('bg-primary'); indicator.classList.add('border-outline-variant'); }
         });
+
+        const minInput = document.querySelector('[data-filter-precio-min]');
+        const maxInput = document.querySelector('[data-filter-precio-max]');
+        if (minInput) minInput.value = minInput.getAttribute('placeholder') || '';
+        if (maxInput) maxInput.value = maxInput.getAttribute('placeholder') || '';
+
+        readPriceInputs();
         applyFilters();
     }
 
-    function initCheckboxVisuals() {
-        document.querySelectorAll('[data-filter-lavado], [data-filter-fit]').forEach((input) => {
-            input.addEventListener('change', () => {
-                const indicator = input.closest('label')?.querySelector('[data-filter-indicator]');
-                if (!indicator) return;
-                indicator.classList.toggle('bg-primary', input.checked);
-                indicator.classList.toggle('border-outline-variant', !input.checked);
-            });
+    function initSideFilters() {
+        const root = document.querySelector('[data-side-filters]');
+        const toggle = root?.querySelector('[data-filter-toggle]');
+        const panel = root?.querySelector('[data-side-panel]');
+        if (!root || !toggle || !panel) return;
+
+        toggle.addEventListener('click', () => {
+            const open = root.classList.toggle('is-open');
+            panel.hidden = !open;
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
-    }
-
-    function initCategoryDropdown() {
-        const dropdown = document.querySelector('[data-category-dropdown]');
-        const trigger = dropdown?.querySelector('[data-category-trigger]');
-        const menu = dropdown?.querySelector('.catalog-category-menu');
-        if (!dropdown || !trigger || !menu) return;
-
-        const close = () => { dropdown.classList.remove('is-open'); trigger.setAttribute('aria-expanded', 'false'); menu.hidden = true; };
-        const open = () => { dropdown.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); menu.hidden = false; };
-
-        trigger.addEventListener('click', () => dropdown.classList.contains('is-open') ? close() : open());
-        document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) close(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
     }
 
     function parseGalleryUrls(raw) {
@@ -263,10 +300,10 @@
     initCardSizeSelectors();
     initCardColorSelectors();
     initProductDetailColor();
+    initSideFilters();
     initSidebarSizeFilters();
-    initCheckboxFilters('[data-filter-lavado]', filters.lavados);
-    initCheckboxFilters('[data-filter-fit]', filters.fits);
-    initCheckboxVisuals();
-    initCategoryDropdown();
+    initColorFilters();
+    initPriceFilters();
+    readPriceInputs();
     initCardGalleries();
 })();

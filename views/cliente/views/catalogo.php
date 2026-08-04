@@ -3,47 +3,97 @@
 $authInViews = true;
 require_once dirname(__DIR__, 3) . '/includes/auth.php';
 require_once dirname(__DIR__, 3) . '/models/Producto.php';
+require_once __DIR__ . '/../includes/sport-images.php';
 
 $categorias = Producto::listarCategorias();
 $categoriaSlugRequest = isset($_GET['categoria']) ? trim((string) $_GET['categoria']) : '';
+$esHub = $categoriaSlugRequest === '';
+$esTodo = $categoriaSlugRequest === 'todo';
+
 $categoria = null;
 $categoriaSlug = '';
+$productos = [];
+$filtros = [
+    'tallas' => [],
+    'lavados' => [],
+    'fits' => [],
+    'colores' => [],
+    'precio_min' => 0,
+    'precio_max' => 0,
+];
+$esPantalonetas = false;
 
-if ($categoriaSlugRequest !== '') {
-    $categoria = Producto::obtenerCategoriaPorSlug($categoriaSlugRequest);
-}
+$hubItems = [
+    [
+        'slug' => 'todo',
+        'num' => '00',
+        'nombre' => 'Ver todo',
+        'accent' => 'all',
+    ],
+    [
+        'slug' => 'camisetas',
+        'num' => '01',
+        'nombre' => 'Camisetas',
+        'accent' => 'camisetas',
+    ],
+    [
+        'slug' => 'pantalonetas',
+        'num' => '02',
+        'nombre' => 'Pantalonetas',
+        'accent' => 'pantalonetas',
+    ],
+    [
+        'slug' => 'bermudas',
+        'num' => '03',
+        'nombre' => 'Bermudas',
+        'accent' => 'bermudas',
+    ],
+    [
+        'slug' => 'medias',
+        'num' => '04',
+        'nombre' => 'Medias',
+        'accent' => 'medias',
+    ],
+    [
+        'slug' => 'gorras',
+        'num' => '05',
+        'nombre' => 'Gorras',
+        'accent' => 'gorras',
+    ],
+];
 
-if ($categoria) {
-    $categoriaSlug = (string) $categoria['slug'];
-} elseif (!empty($categorias)) {
-    $categoria = Producto::obtenerCategoriaPorSlug((string) $categorias[0]['slug']);
-    if ($categoria) {
-        $categoriaSlug = (string) $categoria['slug'];
+if (!$esHub) {
+    if ($esTodo) {
+        $categoriaSlug = 'todo';
+        $tituloPagina = 'Ver todo';
+        $categoriaNombreUi = 'Ver todo';
+        $productos = Producto::listarPorCategoria(null);
+    } else {
+        $categoria = Producto::obtenerCategoriaPorSlug($categoriaSlugRequest);
+        if ($categoria) {
+            $categoriaSlug = (string) $categoria['slug'];
+            $tituloPagina = (string) $categoria['nombre'];
+            $categoriaNombreUi = (string) $categoria['nombre'];
+            $productos = Producto::listarPorCategoria($categoriaSlug);
+        } else {
+            $categoriaSlug = $categoriaSlugRequest;
+            $tituloPagina = ucfirst(str_replace('-', ' ', $categoriaSlugRequest));
+            $categoriaNombreUi = $tituloPagina;
+            $productos = [];
+        }
     }
+
+    $filtros = Producto::extraerFiltros($productos);
+    $esPantalonetas = in_array($categoriaSlug, ['pantalonetas', 'pantalonetas-pro'], true);
+} else {
+    $tituloPagina = 'Catálogo';
 }
-
-$productos = $categoriaSlug !== ''
-    ? Producto::listarPorCategoria($categoriaSlug)
-    : Producto::listarPorCategoria(null);
-
-$filtros = Producto::extraerFiltros($productos);
-$esPantalonetas = in_array($categoriaSlug, ['pantalonetas', 'pantalonetas-pro'], true);
-
-$tituloPagina = $categoria['nombre'] ?? 'Catálogo';
-$categoriaNombreUi = $categoria['nombre'] ?? ($productos ? 'Todos los productos' : 'Catálogo');
-
-$bannerKey = match (true) {
-    $categoriaSlug === 'camisetas' => 'catalogo_camisetas',
-    in_array($categoriaSlug, ['pantalonetas', 'jeans', 'pantalonetas-pro'], true) => 'catalogo_pantalonetas',
-    default => 'hero_main',
-};
-
-require_once __DIR__ . '/../includes/sport-images.php';
 
 $navInViews = true;
 $activePage = 'catalogo';
 $cartBasePath = $assetBase;
 $cartUrl = 'carrito_compras.php';
+$catalogoHubUrl = 'catalogo.php';
 
 ?>
 <!DOCTYPE html>
@@ -53,7 +103,7 @@ $cartUrl = 'carrito_compras.php';
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title><?= htmlspecialchars($tituloPagina) ?> | DEPORTIVO</title>
+    <title><?= htmlspecialchars($tituloPagina) ?> | VEMA</title>
     <?php $pageCss = 'pages/catalogo.css'; include __DIR__ . '/../includes/design-head.php'; ?>
 </head>
 
@@ -61,108 +111,126 @@ $cartUrl = 'carrito_compras.php';
     <?php include __DIR__ . '/../includes/site-nav.php'; ?>
     <?php $defaultCategoriaId = (int) ($categoria['id'] ?? 0); include dirname(__DIR__, 2) . '/administrador/includes/admin-panel.php'; ?>
 
-    <section class="page-hero">
-        <img src="<?= deportivo_img_ctx($bannerKey, 'xl') ?>" alt="<?= htmlspecialchars($tituloPagina) ?> deportivas"<?= deportivo_admin_site_img($bannerKey) ?> />
-        <div class="absolute inset-0 bg-black/40"></div>
-        <div class="page-hero-content text-white max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop">
-            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.25em] block mb-3">Catálogo</span>
-            <h1 class="font-display-lg text-display-lg md:text-display-lg uppercase leading-none mb-4"><?= htmlspecialchars($tituloPagina) ?></h1>
-            <p class="font-body-lg text-body-lg text-white/80 max-w-xl"><?= htmlspecialchars($categoria['descripcion'] ?? '') ?></p>
-        </div>
-    </section>
+    <?php if ($esHub): ?>
+    <main class="catalog-hub">
+        <header class="catalog-hub-intro editorial-reveal">
+            <h1 class="catalog-hub-title font-display-lg uppercase">Elige tu categoría. </h1>
 
-    <main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20 reveal">
-        <div class="editorial-grid gap-gutter-desktop">
-            <!-- Sidebar Filters -->
-            <aside class="col-span-12 md:col-span-3 space-y-12 mb-12 md:mb-0" id="catalog-filters">
-                <?php if (!empty($filtros['tallas'])): ?>
-                <div class="space-y-6">
-                    <h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest">Talla</h3>
-                    <div class="flex flex-wrap gap-2" id="filter-tallas">
-                        <?php foreach ($filtros['tallas'] as $talla): ?>
-                        <button type="button" data-filter-talla="<?= htmlspecialchars($talla) ?>" class="w-10 h-10 flex items-center justify-center border border-outline-variant font-label-md text-label-md hover:border-secondary transition-colors"><?= htmlspecialchars($talla) ?></button>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <?php endif; ?>
-                <?php if ($esPantalonetas && !empty($filtros['lavados'])): ?>
-                <div class="space-y-6">
-                    <h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest">Color</h3>
-                    <ul class="space-y-3 font-body-md text-body-md">
-                        <?php foreach ($filtros['lavados'] as $lavado): ?>
-                        <li>
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" class="sr-only" data-filter-lavado value="<?= htmlspecialchars($lavado, ENT_QUOTES) ?>" />
-                                <div data-filter-indicator class="w-4 h-4 border border-outline-variant group-hover:border-secondary"></div>
-                                <?= htmlspecialchars(Producto::traducirLavado($lavado)) ?>
-                            </label>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-                <?php endif; ?>
-                <?php if ($esPantalonetas && !empty($filtros['fits'])): ?>
-                <div class="space-y-6">
-                    <h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest">Corte</h3>
-                    <ul class="space-y-3 font-body-md text-body-md">
-                        <?php foreach ($filtros['fits'] as $fit): ?>
-                        <li>
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" class="sr-only" data-filter-fit value="<?= htmlspecialchars($fit, ENT_QUOTES) ?>" />
-                                <div data-filter-indicator class="w-4 h-4 border border-outline-variant group-hover:border-secondary"></div>
-                                <?= htmlspecialchars(Producto::traducirFit($fit)) ?>
-                            </label>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-                <?php endif; ?>
-                <button type="button" id="reset-filters" class="w-full py-4 bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-widest hover:opacity-90 transition-all">
-                    Restablecer filtros
+        </header>
+
+        <section class="catalog-hub-grid" aria-label="Categorías del catálogo">
+            <?php foreach ($hubItems as $i => $item): ?>
+            <a
+                href="catalogo.php?categoria=<?= urlencode($item['slug']) ?>"
+                class="catalog-hub-card catalog-hub-card--<?= htmlspecialchars($item['accent']) ?> editorial-reveal"
+                style="--hub-i: <?= $i ?>"
+            >
+                <span class="catalog-hub-card-num" aria-hidden="true"><?= htmlspecialchars($item['num']) ?></span>
+                <span class="catalog-hub-card-name font-headline-sm uppercase"><?= htmlspecialchars($item['nombre']) ?></span>
+                <span class="catalog-hub-card-go material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+            </a>
+            <?php endforeach; ?>
+        </section>
+    </main>
+    <?php else: ?>
+    <main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-6 md:py-12 reveal">
+        <div class="catalog-products-head mb-6 md:mb-8">
+            <a href="<?= htmlspecialchars($catalogoHubUrl) ?>" class="catalog-back font-label-sm text-label-sm uppercase tracking-[0.2em] no-underline inline-flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Volver al catálogo
+            </a>
+            <h1 class="sr-only"><?= htmlspecialchars($tituloPagina) ?></h1>
+        </div>
+
+        <div class="catalog-layout">
+            <aside class="catalog-side-filters" data-side-filters>
+                <button
+                    type="button"
+                    class="catalog-side-toggle"
+                    data-filter-toggle
+                    aria-expanded="false"
+                    aria-controls="catalog-side-panel"
+                >
+                    <span class="catalog-side-toggle-left">
+                        <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+                        Filtrar
+                    </span>
+                    <span class="material-symbols-outlined catalog-side-chevron" aria-hidden="true">expand_more</span>
                 </button>
-            </aside>
-            <!-- Product Grid -->
-            <section class="col-span-12 md:col-span-9">
-                <?php if (!empty($categorias)): ?>
-                <div class="catalog-category-bar flex justify-end mb-8 md:mb-10">
-                    <div class="catalog-category-dropdown" data-category-dropdown>
-                        <span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest sr-only">Categoría</span>
-                        <button type="button"
-                                class="catalog-category-trigger"
-                                data-category-trigger
-                                aria-haspopup="listbox"
-                                aria-expanded="false"
-                                aria-controls="catalog-category-menu">
-                            <span><?= htmlspecialchars($categoriaNombreUi) ?></span>
-                            <span class="material-symbols-outlined catalog-category-chevron" aria-hidden="true">expand_more</span>
-                        </button>
-                        <ul class="catalog-category-menu"
-                            id="catalog-category-menu"
-                            role="listbox"
-                            aria-label="Categorías"
-                            hidden>
-                            <?php foreach ($categorias as $cat): ?>
-                            <?php $esActiva = $cat['slug'] === $categoriaSlug; ?>
-                            <li role="option" <?= $esActiva ? 'aria-selected="true"' : 'aria-selected="false"' ?>>
-                                <?php if ($esActiva): ?>
-                                <span class="catalog-category-option is-active"><?= htmlspecialchars($cat['nombre']) ?></span>
-                                <?php else: ?>
-                                <a href="catalogo.php?categoria=<?= urlencode($cat['slug']) ?>"
-                                   class="catalog-category-option">
-                                    <?= htmlspecialchars($cat['nombre']) ?>
-                                </a>
-                                <?php endif; ?>
+
+                <div class="catalog-side-panel" id="catalog-side-panel" data-side-panel hidden>
+                    <div class="catalog-side-section">
+                        <p class="catalog-side-label">Precio</p>
+                        <div class="catalog-filter-price">
+                            <label class="catalog-filter-field">
+                                <span>Desde</span>
+                                <input type="number" inputmode="numeric" min="0" step="1000"
+                                       data-filter-precio-min
+                                       value="<?= (int) ($filtros['precio_min'] ?? 0) ?>"
+                                       placeholder="<?= (int) ($filtros['precio_min'] ?? 0) ?>" />
+                            </label>
+                            <label class="catalog-filter-field">
+                                <span>Hasta</span>
+                                <input type="number" inputmode="numeric" min="0" step="1000"
+                                       data-filter-precio-max
+                                       value="<?= (int) ($filtros['precio_max'] ?? 0) ?>"
+                                       placeholder="<?= (int) ($filtros['precio_max'] ?? 0) ?>" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="catalog-side-section">
+                        <p class="catalog-side-label">Talla</p>
+                        <?php if (!empty($filtros['tallas'])): ?>
+                        <div class="catalog-filter-chips" id="filter-tallas">
+                            <?php foreach ($filtros['tallas'] as $talla): ?>
+                            <button type="button" data-filter-talla="<?= htmlspecialchars($talla) ?>" class="catalog-filter-chip"><?= htmlspecialchars($talla) ?></button>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php else: ?>
+                        <p class="catalog-filter-empty">Sin tallas en esta categoría.</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="catalog-side-section">
+                        <p class="catalog-side-label">Color</p>
+                        <?php if (!empty($filtros['colores'])): ?>
+                        <ul class="catalog-filter-checks">
+                            <?php foreach ($filtros['colores'] as $color): ?>
+                            <li>
+                                <label class="catalog-filter-check">
+                                    <input type="checkbox" data-filter-color value="<?= htmlspecialchars($color, ENT_QUOTES) ?>" />
+                                    <span><?= htmlspecialchars($color) ?></span>
+                                </label>
                             </li>
                             <?php endforeach; ?>
                         </ul>
+                        <?php else: ?>
+                        <p class="catalog-filter-empty">Sin colores disponibles.</p>
+                        <?php endif; ?>
                     </div>
+
+                    <div class="catalog-side-section">
+                        <p class="catalog-side-label">Marca</p>
+                        <p class="catalog-filter-empty">Filtro de marca próximamente.</p>
+                        <ul class="catalog-filter-checks catalog-filter-checks--disabled" aria-disabled="true">
+                            <li><label class="catalog-filter-check"><input type="checkbox" disabled /><span>Nike</span></label></li>
+                            <li><label class="catalog-filter-check"><input type="checkbox" disabled /><span>Adidas</span></label></li>
+                            <li><label class="catalog-filter-check"><input type="checkbox" disabled /><span>Under Armour</span></label></li>
+                            <li><label class="catalog-filter-check"><input type="checkbox" disabled /><span>ON</span></label></li>
+                        </ul>
+                    </div>
+
+                    <button type="button" class="catalog-side-reset" id="reset-filters">Limpiar filtros</button>
                 </div>
-                <?php endif; ?>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-gutter-desktop" id="catalog-grid">
+            </aside>
+
+            <section class="catalog-products-wrap">
+                <div class="catalog-products-grid" id="catalog-grid">
                     <?php if (empty($productos)): ?>
                     <p class="col-span-full font-body-md text-body-md text-on-surface-variant">
-                        <?php if (empty($categorias)): ?>
-                            No hay categorías ni productos en la tienda todavía. Si eres administrador, crea categorías y productos desde el panel.
+                        <?php if ($categoria === null && !$esTodo): ?>
+                            Pronto llegarán productos a <strong><?= htmlspecialchars($tituloPagina) ?></strong>. Mientras tanto, explora otras categorías desde el <a href="<?= htmlspecialchars($catalogoHubUrl) ?>" class="underline hover:text-secondary">catálogo</a>.
                         <?php else: ?>
                             No hay productos disponibles en esta categoría.
                         <?php endif; ?>
@@ -174,21 +242,22 @@ $cartUrl = 'carrito_compras.php';
                     <p id="catalog-empty-filters" class="col-span-full font-body-md text-body-md text-on-surface-variant hidden">Ningún producto coincide con los filtros seleccionados.</p>
                     <?php endif; ?>
                 </div>
-                <!-- Paginación -->
-                <div class="mt-20 flex items-center justify-center space-x-4 border-t border-outline-variant pt-12">
-                    <span class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Página</span>
-                    <span class="font-label-md text-label-md px-4 py-2 bg-secondary-container text-on-secondary-container">01</span>
-                </div>
             </section>
         </div>
     </main>
+    <?php endif; ?>
+
     <?php include __DIR__ . '/../includes/site-footer.php'; ?>
     <script>
-        document.querySelectorAll('.reveal').forEach(el => {
-            new IntersectionObserver(([e]) => { if (e.isIntersecting) e.target.classList.add('visible'); }, { threshold: 0.1 }).observe(el);
+        document.querySelectorAll('.editorial-reveal, .reveal').forEach((el) => {
+            new IntersectionObserver(([e]) => {
+                if (e.isIntersecting) e.target.classList.add('visible');
+            }, { threshold: 0.1 }).observe(el);
         });
     </script>
+    <?php if (!$esHub): ?>
     <script src="<?= htmlspecialchars($clienteJsPath) ?>catalogo-filters.js"></script>
+    <?php endif; ?>
     <?php $cartBasePath = $assetBase; $cartUrl = 'carrito_compras.php'; $cartPart = 'modal'; include __DIR__ . '/../includes/cart-widget.php'; ?>
     <script src="<?= htmlspecialchars($assetBase) ?>js/theme/toggle.js"></script>
 </body>

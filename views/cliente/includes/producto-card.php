@@ -29,6 +29,8 @@ $tieneGaleriaCard = count($galeriaUrls) > 1;
     data-lavado="<?= htmlspecialchars($producto['lavado'] ?? '', ENT_QUOTES) ?>"
     data-fit="<?= htmlspecialchars($producto['fit'] ?? '', ENT_QUOTES) ?>"
     data-tallas="<?= htmlspecialchars(implode(',', $producto['tallas']), ENT_QUOTES) ?>"
+    data-colores="<?= htmlspecialchars(implode(',', $producto['colores_filtro'] ?? Producto::coloresParaFiltro($producto)), ENT_QUOTES) ?>"
+    data-precio="<?= htmlspecialchars((string) (float) $producto['precio'], ENT_QUOTES) ?>"
     <?= $esAdminCard ? 'data-admin-edit-card="' . $productoId . '"' : '' ?>
 >
     <div class="aspect-[3/4] mb-6 overflow-hidden bg-surface-container relative"<?php if ($tieneGaleriaCard): ?> data-card-gallery data-gallery-urls="<?= htmlspecialchars(json_encode($galeriaUrls, JSON_UNESCAPED_SLASHES), ENT_QUOTES) ?>"<?php endif; ?>>
