@@ -49,3 +49,4 @@ $navClass = static function (string $page) use ($activePage): string {
         </div>
     </div>
 </nav>
+<?php include __DIR__ . '/welcome-toast.php'; ?>

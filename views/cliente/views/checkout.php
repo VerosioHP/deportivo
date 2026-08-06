@@ -1,11 +1,27 @@
 <?php
 
-session_start();
-
 require_once dirname(__DIR__, 3) . '/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/models/Usuario.php';
 
-$nombreSesion = $_SESSION['nombre'] ?? '';
-$emailSesion = $_SESSION['email'] ?? '';
+$checkoutNombre = '';
+$checkoutApellido = '';
+$checkoutEmail = '';
+$checkoutTelefono = '';
+
+if ($usuarioLogueado && !empty($_SESSION['usuario_id'])) {
+    $usuarioCheckout = Usuario::obtenerPorId((int) $_SESSION['usuario_id']);
+    if ($usuarioCheckout) {
+        $checkoutNombre = (string) ($usuarioCheckout['nombre'] ?? '');
+        $checkoutApellido = (string) ($usuarioCheckout['apellido'] ?? '');
+        $checkoutEmail = (string) ($usuarioCheckout['email'] ?? '');
+        $checkoutTelefono = (string) ($usuarioCheckout['telefono'] ?? '');
+    } else {
+        $checkoutNombre = (string) ($_SESSION['nombre'] ?? '');
+        $checkoutApellido = (string) ($_SESSION['apellido'] ?? '');
+        $checkoutEmail = (string) ($_SESSION['email'] ?? '');
+    }
+}
+
 $error = $_GET['error'] ?? '';
 
 $mensajesError = [
@@ -43,7 +59,13 @@ $cartUrl = 'carrito_compras.php';
         </nav>
 
         <h1 class="font-display-lg text-display-lg mb-4 text-primary dark:text-primary-fixed uppercase">Datos de envío</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-2xl">Indica dónde quieres recibir tu pedido. Usaremos estos datos para preparar y enviar tu compra.</p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-2xl">
+            <?php if ($usuarioLogueado): ?>
+            Completamos tus datos de cuenta. Revisa la dirección de envío para finalizar.
+            <?php else: ?>
+            Indica dónde quieres recibir tu pedido. Usaremos estos datos para preparar y enviar tu compra.
+            <?php endif; ?>
+        </p>
 
         <?php if ($mensajeError): ?>
         <div class="mb-8 p-4 border border-error/30 bg-error-container/30 text-on-error-container font-body-md">
@@ -65,22 +87,22 @@ $cartUrl = 'carrito_compras.php';
                         <h2 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed">Información personal</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="nombre">Nombre *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="nombre" name="nombre" type="text" required value="<?= htmlspecialchars($nombreSesion) ?>" placeholder="María" />
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="nombre">Nombres *</label>
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="nombre" name="nombre" type="text" required autocomplete="given-name" value="<?= htmlspecialchars($checkoutNombre) ?>" placeholder="María" />
                             </div>
                             <div>
-                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="apellido">Apellido *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="apellido" name="apellido" type="text" required placeholder="García" />
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="apellido">Apellidos *</label>
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="apellido" name="apellido" type="text" required autocomplete="family-name" value="<?= htmlspecialchars($checkoutApellido) ?>" placeholder="García" />
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="email">Correo electrónico *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="email" name="email" type="email" required value="<?= htmlspecialchars($emailSesion) ?>" placeholder="nombre@ejemplo.com" />
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="email" name="email" type="email" required autocomplete="email" value="<?= htmlspecialchars($checkoutEmail) ?>" placeholder="nombre@ejemplo.com" />
                             </div>
                             <div>
                                 <label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="telefono">Teléfono *</label>
-                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="telefono" name="telefono" type="tel" required placeholder="+57 300 000 000" />
+                                <input class="w-full py-3 bg-transparent border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 font-body-md" id="telefono" name="telefono" type="tel" required autocomplete="tel" value="<?= htmlspecialchars($checkoutTelefono) ?>" placeholder="+57 300 000 000" />
                             </div>
                         </div>
                     </div>

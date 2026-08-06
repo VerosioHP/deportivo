@@ -181,6 +181,41 @@ class Pedido
         return $pedido;
     }
 
+    public static function listarPorUsuario(int $usuarioId, int $limit = 50, int $offset = 0): array
+    {
+        global $conexion;
+
+        if ($usuarioId <= 0) {
+            return [];
+        }
+
+        $limit = max(1, min(100, $limit));
+        $offset = max(0, $offset);
+
+        $stmt = $conexion->prepare(
+            'SELECT * FROM pedidos
+             WHERE usuario_id = :uid
+             ORDER BY fecha_creacion DESC
+             LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset
+        );
+        $stmt->bindValue(':uid', $usuarioId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $pedidos = $stmt->fetchAll();
+
+        foreach ($pedidos as &$pedido) {
+            $itemsStmt = $conexion->prepare(
+                'SELECT * FROM pedido_items WHERE pedido_id = :pedido_id ORDER BY id ASC'
+            );
+            $itemsStmt->bindValue(':pedido_id', (int) $pedido['id'], PDO::PARAM_INT);
+            $itemsStmt->execute();
+            $pedido['items'] = $itemsStmt->fetchAll();
+        }
+        unset($pedido);
+
+        return $pedidos;
+    }
+
     public static function listar(?string $estado = null, int $limit = 50, int $offset = 0): array
     {
         global $conexion;

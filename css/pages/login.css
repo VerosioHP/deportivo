@@ -1,12 +1,487 @@
-.editorial-shadow {
-    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.05);
+/* Auth — login / registro / recuperar */
+
+.auth-page {
+    position: relative;
 }
 
-input:focus {
+.auth-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0, 0, 0, 0.06), transparent 55%),
+        linear-gradient(165deg, #f7f7f7 0%, #ffffff 42%, #f0f0f0 100%);
+}
+
+html.dark .auth-page::before {
+    background:
+        radial-gradient(ellipse 70% 45% at 50% -5%, rgba(255, 255, 255, 0.07), transparent 50%),
+        linear-gradient(165deg, #050505 0%, #0a0a0a 45%, #111 100%);
+}
+
+.auth-main {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem var(--spacing-margin-mobile) 3.5rem;
+}
+
+@media (min-width: 768px) {
+    .auth-main {
+        padding-left: var(--spacing-margin-desktop);
+        padding-right: var(--spacing-margin-desktop);
+    }
+}
+
+.auth-shell {
+    width: 100%;
+    max-width: 26rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.auth-brand {
+    text-align: center;
+    animation: auth-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-brand-mark {
+    margin: 0;
+    font-family: Anybody, sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.4rem, 6vw, 3.1rem);
+    letter-spacing: 0.22em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.auth-brand-tag {
+    margin: 0.55rem 0 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    opacity: 0.55;
+}
+
+.auth-card,
+.recover-card {
+    border: 1px solid var(--color-outline-variant);
+    background: rgba(255, 255, 255, 0.92);
+    color: #0d0d0e;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.06);
+    padding: 2rem 1.75rem;
+    animation: auth-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+@media (min-width: 768px) {
+    .auth-card,
+    .recover-card {
+        padding: 2.5rem 2.25rem;
+    }
+}
+
+html.dark .auth-card,
+html.dark .recover-card {
+    background: rgba(18, 18, 18, 0.92);
+    color: #f5f5f5;
+    border-color: #2a2a2a;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.auth-panel {
+    display: grid;
+    gap: 2rem;
+}
+
+.auth-panel.hidden,
+.auth-panel[hidden] {
+    display: none;
+}
+
+.auth-intro {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.auth-title,
+.recover-title {
+    margin: 0;
+    font-family: Anybody, sans-serif;
+    font-weight: 700;
+    font-size: 1.55rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.15;
+}
+
+.auth-lead,
+.recover-lead {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.68;
+}
+
+.auth-flash {
+    margin: 0.75rem 0 0;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.auth-flash.is-ok {
+    background: color-mix(in srgb, #16a34a 14%, transparent);
+    color: #15803d;
+}
+
+.auth-flash.is-error {
+    background: color-mix(in srgb, #dc2626 12%, transparent);
+    color: #b91c1c;
+}
+
+html.dark .auth-flash.is-ok {
+    color: #86efac;
+}
+
+html.dark .auth-flash.is-error {
+    color: #fca5a5;
+}
+
+.auth-form {
+    display: grid;
+    gap: 1.15rem;
+}
+
+.auth-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+}
+
+@media (min-width: 480px) {
+    .auth-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+    }
+}
+
+.auth-field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.auth-field-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.auth-field label,
+.recover-card label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.auth-optional {
+    opacity: 0.55;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 0.75rem;
+}
+
+.auth-field input,
+.recover-card input[type="email"],
+.recover-card input[type="password"],
+.recover-card input[type="text"],
+.recover-card input[type="tel"] {
+    width: 100%;
+    padding: 0.85rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--color-outline-variant);
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 1rem;
+    color: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.auth-field input:focus,
+.recover-card input:focus {
     outline: none;
     box-shadow: none !important;
+    border-bottom-color: currentColor;
 }
 
-.auth-transition {
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.auth-hint {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    opacity: 0.55;
+}
+
+.auth-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    opacity: 0.8;
+}
+
+.auth-check input {
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #000;
+}
+
+html.dark .auth-check input {
+    accent-color: #fff;
+}
+
+.auth-check a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.auth-submit {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 1rem 1.25rem;
+    border: 0;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-family: Anybody, sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease, background 0.2s ease;
+}
+
+.auth-submit:hover {
+    opacity: 0.9;
+}
+
+.auth-submit:active {
+    transform: scale(0.985);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0.25rem 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.15;
+}
+
+.auth-divider span {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    white-space: nowrap;
+}
+
+.auth-social {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+
+.auth-social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.75rem 0.5rem;
+    border: 1px solid var(--color-outline-variant);
+    background: transparent;
+    color: inherit;
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.auth-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.auth-link:hover {
+    opacity: 1;
+}
+
+.auth-field-head .auth-link {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.auth-switch {
+    margin: 0;
+    text-align: center;
+    font-size: 0.92rem;
+    opacity: 0.75;
+}
+
+.auth-switch .auth-link {
+    margin-left: 0.25rem;
+}
+
+@keyframes auth-rise {
+    from {
+        opacity: 0;
+        transform: translateY(0.85rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Recuperar (usa la misma tarjeta) */
+.recover-identify-note {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    opacity: 0.7;
+}
+
+.recover-back:hover {
+    opacity: 1;
+}
+
+.recover-steps {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.recover-step {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    opacity: 0.45;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.recover-step.is-active,
+.recover-step.is-done {
+    opacity: 1;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.recover-step-line {
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.2;
+}
+
+.recover-channels {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.recover-channel {
+    position: relative;
+}
+
+.recover-channel input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.recover-channel-box {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.75rem;
+    row-gap: 0.15rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.recover-channel-box .material-symbols-outlined {
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.recover-channel-box strong {
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.recover-channel-box small {
+    opacity: 0.7;
+    font-size: 0.8rem;
+}
+
+.recover-channel input:checked + .recover-channel-box {
+    border-color: currentColor;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.recover-msg {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.9rem;
+}
+
+.recover-msg.is-ok {
+    background: color-mix(in srgb, #16a34a 16%, transparent);
+    color: #16a34a;
+}
+
+.recover-msg.is-error {
+    background: color-mix(in srgb, #dc2626 14%, transparent);
+    color: #b91c1c;
+}
+
+html.dark .recover-msg.is-error {
+    color: #fca5a5;
 }

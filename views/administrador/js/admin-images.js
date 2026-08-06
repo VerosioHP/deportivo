@@ -161,7 +161,7 @@
                     if (img) img.src = detail.url;
                 }
                 el.classList?.remove('is-empty');
-                el.closest('.nosotros-mosaic-item')?.classList.remove('is-empty');
+                el.closest('.nosotros-mosaic-item, .login-visual')?.classList.remove('is-empty');
             });
             return;
         }

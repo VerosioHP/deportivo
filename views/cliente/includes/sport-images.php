@@ -30,7 +30,7 @@ function deportivo_img(string $key, string $size = 'lg', bool $desdeVistas = fal
         'medellin_4'          => '',
         'medellin_5'          => '',
         'medellin_6'          => '',
-        'login_side'          => 'photo-1571019614242-c5c5dee9f50b',
+        'login_side'          => '',
         'catalogo_camisetas'  => 'photo-1521572163474-6864f9cf17ab',
         'catalogo_pantalonetas' => 'photo-1552674605-db6ffd4facb5',
     ];

@@ -38,6 +38,7 @@ if (
     $_SESSION['apellido'] = $usuario['apellido'] ?? '';
     $_SESSION['email'] = $usuario['email'];
     $_SESSION['rol'] = $usuario['rol'];
+    $_SESSION['mostrar_bienvenida'] = true;
 
     header('Location: ../index.php');
     exit;

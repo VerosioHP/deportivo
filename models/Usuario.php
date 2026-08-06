@@ -22,7 +22,8 @@ class Usuario
         global $conexion;
 
         $stmt = $conexion->prepare(
-            'SELECT id, nombre, apellido, email, rol, fecha_creacion FROM usuarios WHERE id = :id LIMIT 1'
+            'SELECT id, nombre, apellido, email, telefono, fecha_nacimiento, rol, fecha_creacion
+             FROM usuarios WHERE id = :id LIMIT 1'
         );
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -140,6 +141,96 @@ class Usuario
             ':apellido' => $apellido !== '' ? $apellido : null,
             ':email' => $email,
             ':rol' => $rol,
+            ':id' => $id,
+        ];
+
+        if ($password !== null && $password !== '') {
+            $sql .= ', password = :password';
+            $params[':password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        $sql .= ' WHERE id = :id';
+
+        $stmt = $conexion->prepare($sql);
+
+        return $stmt->execute($params);
+    }
+
+    public static function actualizarPerfilCliente(
+        int $id,
+        string $nombre,
+        string $apellido,
+        string $email,
+        ?string $telefono = null,
+        ?string $fechaNacimiento = null,
+        ?string $password = null
+    ): bool {
+        global $conexion;
+
+        if ($id <= 0) {
+            return false;
+        }
+
+        $usuario = self::obtenerPorId($id);
+        if (!$usuario) {
+            return false;
+        }
+
+        $nombre = trim($nombre);
+        $apellido = trim($apellido);
+        $email = trim($email);
+        $password = $password !== null ? trim($password) : null;
+
+        if ($apellido === '') {
+            throw new InvalidArgumentException('Los apellidos son obligatorios.');
+        }
+
+        self::validarDatos($nombre, $email, $password ?? 'placeholder', $password !== null && $password !== '');
+
+        if (self::emailExiste($email, $id)) {
+            throw new InvalidArgumentException('Ya existe otro usuario con ese correo.');
+        }
+
+        if ($fechaNacimiento !== null && $fechaNacimiento !== '') {
+            $nacimiento = DateTimeImmutable::createFromFormat('Y-m-d', $fechaNacimiento);
+            $okFecha = $nacimiento && $nacimiento->format('Y-m-d') === $fechaNacimiento;
+            $minAge = (new DateTimeImmutable('today'))->modify('-13 years');
+            $maxAge = new DateTimeImmutable('1920-01-01');
+            if (!$okFecha || $nacimiento > $minAge || $nacimiento < $maxAge) {
+                throw new InvalidArgumentException('La fecha de nacimiento no es válida.');
+            }
+        } else {
+            $fechaNacimiento = null;
+        }
+
+        // Asegura columnas opcionales
+        $colTel = $conexion->query("SHOW COLUMNS FROM usuarios LIKE 'telefono'")->fetch();
+        if (!$colTel) {
+            $conexion->exec(
+                'ALTER TABLE `usuarios` ADD COLUMN `telefono` VARCHAR(30) NULL DEFAULT NULL AFTER `email`'
+            );
+        }
+        $colNac = $conexion->query("SHOW COLUMNS FROM usuarios LIKE 'fecha_nacimiento'")->fetch();
+        if (!$colNac) {
+            $conexion->exec(
+                'ALTER TABLE `usuarios` ADD COLUMN `fecha_nacimiento` DATE NULL DEFAULT NULL AFTER `telefono`'
+            );
+        }
+
+        $sql = '
+            UPDATE usuarios
+            SET nombre = :nombre,
+                apellido = :apellido,
+                email = :email,
+                telefono = :telefono,
+                fecha_nacimiento = :fecha_nacimiento
+        ';
+        $params = [
+            ':nombre' => $nombre,
+            ':apellido' => $apellido,
+            ':email' => $email,
+            ':telefono' => $telefono !== null && $telefono !== '' ? $telefono : null,
+            ':fecha_nacimiento' => $fechaNacimiento,
             ':id' => $id,
         ];
 
